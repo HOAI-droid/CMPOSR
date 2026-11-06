@@ -1,0 +1,872 @@
+<title>CMPOSR Orbit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@500;600;700&display=swap">
+<style>
+/* Layout: a gyroscope of light inside a club room; the HUD sits on the edges like silkscreen on hardware. */
+:root {
+  --bg: #050505;
+  --fg: #f2f0eb;
+  --muted: #8e8c87;
+  --line: #262626;
+  --accent: #ff3d14;
+  --panel: rgba(12, 12, 12, 0.8);
+  --display: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--fg); font-family: var(--display); overflow: hidden; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 1; mix-blend-mode: screen; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.top {
+  position: fixed; left: 0; right: 0; top: 0; z-index: 2; pointer-events: none;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 18px);
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+}
+.brand { display: flex; flex-direction: column; gap: 4px; white-space: nowrap; }
+.brand b { font-weight: 700; font-size: 14px; letter-spacing: 0.34em; }
+.brand span, .status span { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); }
+.status { display: flex; align-items: center; gap: 8px; pointer-events: auto; flex-wrap: wrap; justify-content: flex-end; }
+.led { width: 6px; height: 6px; border-radius: 999px; background: #3a1a12; display: inline-block; }
+.led.on { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.chip { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.chip.hot { border-color: var(--accent); color: var(--accent); }
+
+.side { position: fixed; z-index: 2; top: 50%; transform: translateY(-50%); right: max(14px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.side span { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); }
+.depth { width: 4px; height: 160px; border-radius: 2px; background: var(--line); position: relative; }
+.depth b { position: absolute; left: -5px; width: 14px; height: 3px; border-radius: 2px; background: var(--accent); top: 50%; }
+
+.bottom {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; pointer-events: none;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 12px;
+}
+.hint { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--muted); text-align: center; line-height: 1.6; margin: 0; }
+.hint em { font-style: normal; color: var(--fg); }
+.readouts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; max-width: 640px; width: 100%; margin: 0 auto; }
+.ro { border-radius: 12px; border: 1px solid var(--line); background: var(--panel); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.ro .k { font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
+.ro .v { font-size: 18px; font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.ro i { display: block; height: 2px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.ro i b { display: block; height: 100%; width: 0%; background: var(--accent); }
+.worlds { display: flex; gap: 6px; justify-content: center; pointer-events: auto; flex-wrap: wrap; }
+.worlds button { height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; color: var(--muted); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.worlds button[aria-pressed="true"] { color: var(--fg); border-color: var(--accent); }
+
+.intro { position: fixed; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); background: rgba(5, 5, 5, 0.55); }
+.card { max-width: 360px; width: 100%; border-radius: 22px; border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding: 26px 24px; display: flex; flex-direction: column; gap: 16px; }
+.card .eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--accent); }
+.card h1 { margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.05; text-wrap: balance; }
+.card p { margin: 0; font-size: 14px; line-height: 1.55; color: #c9c6bf; }
+.card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.card ul b { color: var(--fg); font-weight: 500; }
+.card .row { display: flex; gap: 8px; }
+.btn { flex: 1; height: 52px; border-radius: 14px; border: 1px solid var(--line); background: #1a1a1a; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 0 #000; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #050505; }
+
+@media (max-width: 420px) {
+  .ro { padding: 8px 9px; }
+  .ro .v { font-size: 15px; }
+  .ro .k span + span { display: none; }
+  .worlds button { padding: 0 11px; font-size: 10px; }
+  .depth { height: 120px; }
+}
+</style>
+
+<canvas id="gl" aria-label="3D-Ringsystem: mit Fingern drehen, schieben und in die Tiefe bewegen"></canvas>
+<div id="flash"></div>
+
+<header class="top">
+  <div class="brand"><b>CMPOSR</b><span>FIELD-1 · ORBIT</span></div>
+  <div class="status">
+    <span><i class="led" id="beatLed"></i></span>
+    <span id="bpmLabel">132 BPM</span>
+    <button class="chip" id="strobeBtn" type="button" aria-pressed="true">STROBE</button>
+    <button class="chip" id="soundBtn" type="button">SOUND AN</button>
+  </div>
+</header>
+
+<div class="side" aria-hidden="true">
+  <span>NAH</span>
+  <div class="depth"><b id="depthMark"></b></div>
+  <span>FERN</span>
+</div>
+
+<section class="bottom">
+  <p class="hint"><em>1 Finger</em> drehen · <em>2 Finger</em> schieben · <em>spreizen</em> nach vorn / hinten · <em>Doppeltipp</em> Strobe-Hit</p>
+  <div class="readouts">
+    <div class="ro"><span class="k"><span>NOTE</span><span>X</span></span><span class="v" id="vNote">F</span><i><b id="bNote"></b></i></div>
+    <div class="ro"><span class="k"><span>FILTER</span><span>Y</span></span><span class="v" id="vCut">40</span><i><b id="bCut"></b></i></div>
+    <div class="ro"><span class="k"><span>RAUM</span><span>TIEFE</span></span><span class="v" id="vSpace">30</span><i><b id="bSpace"></b></i></div>
+    <div class="ro"><span class="k"><span>DRIVE</span><span>NÄHE</span></span><span class="v" id="vDrive">50</span><i><b id="bDrive"></b></i></div>
+  </div>
+  <nav class="worlds" aria-label="Klangwelt">
+    <button type="button" data-world="HYPNO" aria-pressed="true">HYPNOTIC</button>
+    <button type="button" data-world="GROOVE" aria-pressed="false">HARDGROOVE</button>
+    <button type="button" data-world="INDUS" aria-pressed="false">INDUSTRIAL</button>
+  </nav>
+</section>
+
+<div class="intro" id="intro">
+  <div class="card">
+    <span class="eyebrow">FIELD-1 · ORBIT · PROTOTYP</span>
+    <h1>Fünf Ringe. Ein Raum.</h1>
+    <p>Jeder Ring ist ein Instrument, jedes Lichtsegment ein Schlag. Bewege das System durch den Raum – der Sound folgt.</p>
+    <ul>
+      <li><b>Links / rechts</b> wählt den Basston</li>
+      <li><b>Oben / unten</b> öffnet den Filter</li>
+      <li><b>Nach hinten</b> mehr Hall und Weite</li>
+      <li><b>Nach vorn</b> trocken, nah, mehr Druck</li>
+      <li><b>Drehen</b> treibt Hats und Energie</li>
+    </ul>
+    <div class="row">
+      <button class="btn" id="lookBtn" type="button">ANSEHEN</button>
+      <button class="btn primary" id="startBtn" type="button">SOUND STARTEN</button>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// ------------------------------------------------------------------ worlds + patterns
+// x = always, o = sometimes (more often with energy), . = rest
+const WORLDS = {
+  HYPNO: {
+    name: 'HYPNOTIC', bpm: 132, swing: 0, kickTune: 47, kickDrive: 3, rumble: 0.8, ring5: 'STAB',
+    pat: ['x...x...x...x...', '.xxx.xxx.xxx.xxx', 'o.x.o.x.o.x.o.xo', 'x..x.x..x..x.x..', '.......x.......o'],
+  },
+  GROOVE: {
+    name: 'HARDGROOVE', bpm: 144, swing: 0.14, kickTune: 50, kickDrive: 4, rumble: 0.45, ring5: 'CLAP',
+    pat: ['x...x...x...x...', '..xx..xx..xx..xx', 'xoxoxoxoxoxoxoxo', 'x..x..x...x..x..', '....x.......x..o'],
+  },
+  INDUS: {
+    name: 'INDUSTRIAL', bpm: 150, swing: 0, kickTune: 52, kickDrive: 9, rumble: 0.7, ring5: 'METAL',
+    pat: ['x...x...x...x..o', '..x...xo..x...xo', 'oxxoxxoxoxxoxxox', '....x.......x...', '...x..x....x..x.'],
+  },
+};
+let W = WORLDS.HYPNO;
+const RING_NAMES = ['KICK', 'BASS', 'HATS', 'PERC', 'STAB'];
+
+// ------------------------------------------------------------------ renderer / scene
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#050505');
+scene.fog = new THREE.FogExp2(0x050505, 0.045);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+const CAM_Z = 8;
+camera.position.set(0, 0.4, CAM_Z);
+
+const ACCENT = new THREE.Color('#ff3d14');
+const WHITE = new THREE.Color('#f2f0eb');
+const DIM = new THREE.Color('#2a2a2a');
+
+// --- the room: receding light frames (a tunnel of rectangles), floor lines, lasers
+const room = new THREE.Group();
+scene.add(room);
+const FRAMES = 16;
+const frames = [];
+for (let i = 0; i < FRAMES; i++) {
+  const w = 15, h = 9;
+  const g = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-w / 2, -2.6, 0), new THREE.Vector3(w / 2, -2.6, 0),
+    new THREE.Vector3(w / 2, h - 2.6, 0), new THREE.Vector3(-w / 2, h - 2.6, 0),
+  ]);
+  const m = new THREE.LineBasicMaterial({ color: WHITE, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false });
+  const l = new THREE.LineLoop(g, m);
+  l.position.z = 2 - i * 3.2;
+  room.add(l);
+  frames.push({ line: l, mat: m, glow: 0 });
+}
+// floor: long lines running into the depth + cross lines
+{
+  const pts = [];
+  for (let x = -7; x <= 7; x += 1) { pts.push(new THREE.Vector3(x, -2.6, 4), new THREE.Vector3(x, -2.6, -50)); }
+  for (let z = 4; z >= -50; z -= 1.6) { pts.push(new THREE.Vector3(-7.5, -2.6, z), new THREE.Vector3(7.5, -2.6, z)); }
+  const g = new THREE.BufferGeometry().setFromPoints(pts);
+  room.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x1c1c1c })));
+}
+// lasers from the back wall
+const lasers = [];
+const laserGroup = new THREE.Group();
+laserGroup.position.set(0, 5.6, -46);
+room.add(laserGroup);
+for (let i = 0; i < 9; i++) {
+  const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -8.5, 56)]);
+  const m = new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false });
+  const l = new THREE.Line(g, m);
+  laserGroup.add(l);
+  lasers.push({ line: l, mat: m, base: (i - 4) * 0.09, phase: i * 0.7 });
+}
+
+// --- the gyroscope: five nested rings of 16 light segments each
+const gyro = new THREE.Group();
+scene.add(gyro);
+const rings = [];
+const RADII = [2.15, 1.8, 1.47, 1.16, 0.88];
+const TILTS = [[0, 0], [1.05, 0.2], [0.35, 1.2], [1.4, -0.6], [0.7, 2.1]];
+const SEG = 16;
+const segGeoCache = {};
+for (let r = 0; r < 5; r++) {
+  const holder = new THREE.Group();       // fixed tilt
+  holder.rotation.set(TILTS[r][0], TILTS[r][1], 0);
+  const spin = new THREE.Group();         // spins + swings
+  holder.add(spin);
+  gyro.add(holder);
+  const R = RADII[r];
+  const base = new THREE.Mesh(new THREE.TorusGeometry(R, 0.0045, 4, 220), new THREE.MeshBasicMaterial({ color: 0x3a3a3a, transparent: true, opacity: 0.7 }));
+  spin.add(base);
+  const arc = (Math.PI * 2) / SEG;
+  const key = R.toFixed(2);
+  segGeoCache[key] = new THREE.TorusGeometry(R, r === 0 ? 0.03 : 0.022, 6, 18, arc * 0.72);
+  const segs = [];
+  for (let s = 0; s < SEG; s++) {
+    const mat = new THREE.MeshBasicMaterial({ color: DIM.clone(), transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false });
+    const mesh = new THREE.Mesh(segGeoCache[key], mat);
+    // step 0 at 12 o'clock, clockwise
+    mesh.rotation.z = Math.PI / 2 - (s + 0.86) * arc;
+    spin.add(mesh);
+    segs.push({ mesh, mat, hit: 0 });
+  }
+  // tick marking the downbeat
+  const tick = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.16, 0.012), new THREE.MeshBasicMaterial({ color: 0x6a6a6a }));
+  tick.position.y = R;
+  spin.add(tick);
+  rings.push({ holder, spin, segs, swing: 0, swingV: 0, spinRate: [0.0, 0.11, -0.16, 0.21, -0.27][r] });
+}
+// core: a small bright point with three axis lines
+const coreMat = new THREE.MeshBasicMaterial({ color: WHITE });
+const coreDot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 16), coreMat);
+gyro.add(coreDot);
+{
+  const L = 0.42;
+  const g = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-L, 0, 0), new THREE.Vector3(L, 0, 0),
+    new THREE.Vector3(0, -L, 0), new THREE.Vector3(0, L, 0),
+    new THREE.Vector3(0, 0, -L), new THREE.Vector3(0, 0, L),
+  ]);
+  gyro.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0x8e8c87, transparent: true, opacity: 0.6 })));
+}
+// floor marker under the gyro (shows depth position)
+const markMat = new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+const mark = new THREE.Mesh(new THREE.RingGeometry(0.9, 0.93, 128), markMat);
+mark.rotation.x = -Math.PI / 2;
+mark.position.y = -2.58;
+scene.add(mark);
+const markLine = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0)]),
+  new THREE.LineBasicMaterial({ color: 0x3a3a3a, transparent: true, opacity: 0.8 })
+);
+scene.add(markLine);
+
+// post
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.8, 0.5, 0.18);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+let halfW = 2, halfH = 2, worldPerPx = 0.01;
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  composer.setSize(w, h);
+  bloom.resolution.set(w / 2, h / 2);
+  camera.aspect = w / h;
+  camera.fov = w / h < 0.75 ? 62 : 42;
+  camera.updateProjectionMatrix();
+  halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * CAM_Z;
+  halfW = halfH * camera.aspect;
+  worldPerPx = (2 * halfH) / h;
+}
+addEventListener('resize', resize);
+resize();
+
+// ------------------------------------------------------------------ physics / gestures
+const Z_NEAR = 3.2, Z_FAR = -9;
+const S = {
+  omega: new THREE.Vector3(0, 0.18, 0),
+  pos: new THREE.Vector3(0, 0, 0), vel: new THREE.Vector3(), anchor: new THREE.Vector3(),
+  zVel: 0,
+  twistV: 0, pulse: 0, energy: 0, strobe: 0,
+  mode: 'idle',
+};
+const pointers = new Map();
+let gest = null;
+let lastMove = performance.now();
+let tapInfo = { t: 0, x: 0, y: 0 };
+const qTmp = new THREE.Quaternion();
+const axX = new THREE.Vector3(1, 0, 0), axY = new THREE.Vector3(0, 1, 0), axZ = new THREE.Vector3(0, 0, 1);
+const rotateWorld = (axis, a) => { qTmp.setFromAxisAngle(axis, a); gyro.quaternion.premultiply(qTmp); };
+const pxScale = () => worldPerPx * (CAM_Z - S.pos.z) / CAM_Z; // movement follows the finger at any depth
+
+function kickRings(amount) {
+  rings.forEach((r, i) => { r.swingV += amount * (i % 2 ? 1 : -1) * (0.6 + i * 0.22); });
+}
+
+function twoFinger() {
+  const [a, b] = [...pointers.values()];
+  return { cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2, d: Math.hypot(b.x - a.x, b.y - a.y), ang: Math.atan2(b.y - a.y, b.x - a.x) };
+}
+
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+canvas.addEventListener('pointerdown', (e) => {
+  canvas.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), move: e.pointerType === 'mouse' && (e.button === 2 || e.shiftKey) });
+  lastMove = performance.now();
+  if (pointers.size === 1) S.mode = pointers.get(e.pointerId).move ? 'move' : 'rotate';
+  if (pointers.size === 2) { S.mode = 'multi'; gest = twoFinger(); }
+});
+canvas.addEventListener('pointermove', (e) => {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  const now = performance.now();
+  const dt = Math.max(0.004, (now - lastMove) / 1000);
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (S.mode === 'rotate' && pointers.size === 1) {
+    const k = 0.008;
+    rotateWorld(axY, dx * k);
+    rotateWorld(axX, dy * k);
+    S.omega.lerp(new THREE.Vector3(dy * k / dt, dx * k / dt, 0), 0.35);
+  } else if (S.mode === 'move' && pointers.size === 1) {
+    const s = pxScale();
+    S.pos.x += dx * s; S.pos.y -= dy * s;
+    S.vel.lerp(new THREE.Vector3(dx * s / dt, -dy * s / dt, 0), 0.35);
+    S.anchor.copy(S.pos);
+  } else if (pointers.size === 2 && gest) {
+    const g = twoFinger();
+    const s = pxScale();
+    const mx = (g.cx - gest.cx) * s, my = -(g.cy - gest.cy) * s;
+    S.pos.x += mx; S.pos.y += my;
+    // spread = pull towards you, pinch = push into the room
+    const dz = (g.d - gest.d) * 0.022;
+    S.pos.z = clamp(S.pos.z + dz, Z_FAR, Z_NEAR);
+    S.vel.lerp(new THREE.Vector3(mx / dt, my / dt, dz / dt), 0.35);
+    S.anchor.copy(S.pos);
+    let da = g.ang - gest.ang;
+    if (da > Math.PI) da -= Math.PI * 2;
+    if (da < -Math.PI) da += Math.PI * 2;
+    rotateWorld(axZ, -da);
+    S.twistV = THREE.MathUtils.lerp(S.twistV, -da / dt, 0.4);
+    gest = g;
+  }
+  lastMove = now;
+});
+function endPointer(e) {
+  const p = pointers.get(e.pointerId);
+  if (!p) return;
+  pointers.delete(e.pointerId);
+  const now = performance.now();
+  const short = now - p.t < 230 && Math.hypot(p.x - p.sx, p.y - p.sy) < 12;
+  if (short && pointers.size === 0) {
+    if (now - tapInfo.t < 320 && Math.hypot(p.x - tapInfo.x, p.y - tapInfo.y) < 60) { strike(); tapInfo.t = 0; }
+    else tapInfo = { t: now, x: p.x, y: p.y };
+  }
+  if (pointers.size === 1) { S.mode = 'rotate'; gest = null; }
+  if (pointers.size === 0) {
+    S.anchor.copy(S.pos).addScaledVector(S.vel, 0.12);
+    const s = (CAM_Z - S.anchor.z) / CAM_Z;
+    S.anchor.x = clamp(S.anchor.x, -halfW * 0.75 * s, halfW * 0.75 * s);
+    S.anchor.y = clamp(S.anchor.y, -halfH * 0.5 * s, halfH * 0.6 * s);
+    S.anchor.z = clamp(S.anchor.z, Z_FAR, Z_NEAR);
+    kickRings(Math.min(3, S.vel.length() * 0.5 + S.omega.length() * 0.25 + Math.abs(S.twistV) * 0.15));
+    if (now - lastMove > 90) S.omega.multiplyScalar(0.2);
+    S.mode = 'idle';
+    gest = null;
+  }
+}
+canvas.addEventListener('pointerup', endPointer);
+canvas.addEventListener('pointercancel', endPointer);
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  S.pos.z = clamp(S.pos.z - e.deltaY * 0.006, Z_FAR, Z_NEAR);
+  S.anchor.z = S.pos.z;
+  kickRings(0.3);
+}, { passive: false });
+
+let strobeOn = !reduceMotion;
+function strike() {
+  S.strobe = 1;
+  S.pulse = 1;
+  kickRings(4);
+  rings.forEach((r) => r.segs.forEach((sg) => { sg.hit = Math.max(sg.hit, 0.8); }));
+  if (audio) audio.strike();
+}
+
+// ------------------------------------------------------------------ audio
+let audio = null;
+function makeCurve(k, n = 2048) {
+  const c = new Float32Array(n);
+  const t = Math.tanh(k);
+  for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 2 - 1; c[i] = Math.tanh(k * x) / t; }
+  return c;
+}
+function makeIR(ac, sec, decay, dark) {
+  const len = Math.floor(ac.sampleRate * sec);
+  const b = ac.createBuffer(2, len, ac.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = b.getChannelData(ch);
+    let lp = 0;
+    for (let i = 0; i < len; i++) {
+      const t = i / len;
+      lp += ((Math.random() * 2 - 1) - lp) * Math.max(0.03, 0.85 - dark * 0.8 * t);
+      d[i] = (i < ac.sampleRate * 0.012 ? 0 : 1) * lp * Math.pow(1 - t, decay);
+    }
+  }
+  return b;
+}
+
+function createAudio() {
+  const ac = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
+  const G = (v = 1) => { const n = ac.createGain(); n.gain.value = v; return n; };
+  const F = (type, f, q = 0.7) => { const n = ac.createBiquadFilter(); n.type = type; n.frequency.value = f; n.Q.value = q; return n; };
+  const shaper = (k, os = '4x') => { const s = ac.createWaveShaper(); s.curve = makeCurve(k); s.oversample = os; return s; };
+  const comp = (th, ratio, att, rel, knee = 6) => { const c = ac.createDynamicsCompressor(); c.threshold.value = th; c.ratio.value = ratio; c.attack.value = att; c.release.value = rel; c.knee.value = knee; return c; };
+
+  const noise = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+  { const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const noiseSrc = (t, dur) => { const s = ac.createBufferSource(); s.buffer = noise; s.loop = true; s.start(t, Math.random() * 1.5); s.stop(t + dur); return s; };
+
+  // master: bus -> drive -> tone (depth) -> glue -> limiter
+  const out = G(0.92); out.connect(ac.destination);
+  const limiter = comp(-2.5, 20, 0.001, 0.05, 0); limiter.connect(out);
+  const glue = comp(-15, 3, 0.012, 0.14); glue.connect(limiter);
+  const tone = F('lowpass', 20000, 0.8); tone.connect(glue);
+  const mDrive = shaper(1.6); mDrive.connect(tone);
+  const mPre = G(1); mPre.connect(mDrive);
+  const bus = G(1); bus.connect(mPre);
+  const duck = G(1); duck.connect(bus);
+
+  const revSend = G(1); const revRet = G(0.5);
+  const rvHP = F('highpass', 260); const conv = ac.createConvolver(); conv.buffer = makeIR(ac, 4.2, 2.2, 0.7); const rvLP = F('lowpass', 6500);
+  revSend.connect(rvHP); rvHP.connect(conv); conv.connect(rvLP); rvLP.connect(revRet); revRet.connect(duck);
+  const dlySend = G(1); const dL = ac.createDelay(2), dR = ac.createDelay(2); const fb = G(0.45);
+  const fHP = F('highpass', 350), fLP = F('lowpass', 3000); const merge = ac.createChannelMerger(2); const dlyRet = G(0.5);
+  dlySend.connect(dL); dL.connect(dR); dR.connect(fHP); fHP.connect(fLP); fLP.connect(fb); fb.connect(dL);
+  dL.connect(merge, 0, 0); dR.connect(merge, 0, 1); merge.connect(dlyRet); dlyRet.connect(duck); dlyRet.connect(revSend);
+  const rumSend = G(1); const rConv = ac.createConvolver(); rConv.buffer = makeIR(ac, 1.5, 3, 0.95);
+  const rLP = F('lowpass', 150, 1.3); const rSh = shaper(4, '2x'); const rHP = F('highpass', 32); const rOut = G(0.9);
+  rumSend.connect(rConv); rConv.connect(rLP); rLP.connect(rSh); rSh.connect(rHP); rHP.connect(rOut); rOut.connect(duck);
+  const kIn = G(1); const kSh = shaper(W.kickDrive); const kOut = G(0.95); const kRum = G(W.rumble * 1.4);
+  kIn.connect(kSh); kSh.connect(kOut); kOut.connect(bus); kOut.connect(kRum); kRum.connect(rumSend);
+  const bIn = G(1); const bSh = shaper(2); const bHP = F('highpass', 28); const bOut = G(0.8); const bSub = G(1);
+  bIn.connect(bSh); bSh.connect(bHP); bHP.connect(bOut); bOut.connect(duck); bSub.connect(duck);
+  const bDly = G(0.05); bOut.connect(bDly); bDly.connect(dlySend);
+  const dBus = G(1); dBus.connect(bus);
+  const dRev = G(0.15); dBus.connect(dRev); dRev.connect(revSend);
+  const metal = G(0.22);
+  for (const r of [2, 3, 4.16, 5.43, 6.79, 8.21]) { const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = 76 * r; o.connect(metal); o.start(); }
+
+  const P = { cutoff: 0.35, reso: 0.3, grit: 0.4, depth: 0.3, detune: 10, deg: 0, energy: 0 };
+  let lastGrit = -1;
+  let nextT = 0, step = 0, timer = null;
+  const events = [];   // { time, ring, step } for the visuals
+
+  const SCALE = [0, 2, 3, 5, 7, 8, 10];
+  const ROOT = 41;
+  const semi = (deg) => SCALE[((deg % 7) + 7) % 7] + 12 * Math.floor(deg / 7);
+  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+
+  function kick(t, vel = 1) {
+    const f = W.kickTune;
+    const o = ac.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(f * 9, t);
+    o.frequency.exponentialRampToValueAtTime(f * 1.6, t + 0.018);
+    o.frequency.exponentialRampToValueAtTime(f, t + 0.09);
+    o.frequency.linearRampToValueAtTime(f * 0.9, t + 0.45);
+    const g = G(0);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + 0.0015);
+    g.gain.setValueAtTime(vel, t + 0.08); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.46);
+    o.connect(g); g.connect(kIn); o.start(t); o.stop(t + 0.5);
+    const n = noiseSrc(t, 0.03); const bp = F('bandpass', 3500, 0.8); const ng = G(0);
+    ng.gain.setValueAtTime(vel * 0.5, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
+    n.connect(bp); bp.connect(ng); ng.connect(kIn);
+    duck.gain.cancelScheduledValues(t);
+    duck.gain.setTargetAtTime(0.22, t, 0.004);
+    duck.gain.setTargetAtTime(1, t + 0.03, 0.065);
+  }
+  function hat(t, vel, decay, toneF = 8000) {
+    const mg = G(1.5); const n = noiseSrc(t, decay + 0.1); const ng = G(0.5);
+    const bp = F('bandpass', toneF + 2000, 0.6); const hp = F('highpass', toneF, 0.9); const g = G(0);
+    metal.connect(mg); mg.connect(bp); n.connect(ng); ng.connect(bp); bp.connect(hp); hp.connect(g); g.connect(dBus);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + 0.001);
+    g.gain.exponentialRampToValueAtTime(0.001, t + decay); g.gain.setValueAtTime(0, t + decay + 0.002);
+    const ms = (t - ac.currentTime + decay + 0.15) * 1000;
+    setTimeout(() => { try { metal.disconnect(mg); } catch (e) { /* gone */ } }, Math.max(0, ms));
+  }
+  function clap(t, vel, wet = 0.4) {
+    const n = noiseSrc(t, 0.6); const hp = F('highpass', 700); const bp = F('bandpass', 1300, 1.5); const g = G(0); const w = G(wet);
+    const sp = 0.011, v = vel * 1.5;
+    g.gain.setValueAtTime(0, t);
+    for (let k = 0; k < 3; k++) { g.gain.setValueAtTime(v, t + k * sp); g.gain.exponentialRampToValueAtTime(v * 0.12, t + k * sp + sp * 0.95); }
+    g.gain.setValueAtTime(v, t + 3 * sp); g.gain.exponentialRampToValueAtTime(0.001, t + 3 * sp + 0.3);
+    n.connect(hp); hp.connect(bp); bp.connect(g); g.connect(dBus); g.connect(w); w.connect(revSend);
+  }
+  function tom(t, vel, f) {
+    const o = ac.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(f * 2.2, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04);
+    const g = G(0); g.gain.setValueAtTime(vel, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+    const s = G(0.25); o.connect(g); g.connect(dBus); g.connect(s); s.connect(dlySend); o.start(t); o.stop(t + 0.25);
+  }
+  function metalHit(t, vel, f = 260, ring = 0.6) {
+    const ex = noiseSrc(t, 2); const eg = G(0);
+    eg.gain.setValueAtTime(vel * 2.5, t); eg.gain.exponentialRampToValueAtTime(0.0005, t + 0.006);
+    ex.connect(eg);
+    const q = 30 + ring * 220; const sum = G(Math.sqrt(q) * 0.5); const sh = shaper(3, '2x'); const w = G(0.6);
+    [1, 1.593, 2.135, 2.295, 2.917, 3.598].forEach((m, i) => { const bp = F('bandpass', f * m, q * (1 - i * 0.06)); eg.connect(bp); bp.connect(sum); });
+    sum.connect(sh); sh.connect(dBus); sh.connect(w); w.connect(revSend);
+  }
+  function bass(t, deg, dur, vel = 1) {
+    const f = hz(ROOT + semi(deg));
+    const filt = F('lowpass', 200, 1 + P.reso * 16);
+    const cut = 55 * Math.pow(2, P.cutoff * 7.4);
+    filt.frequency.setValueAtTime(Math.min(15000, cut * (2.5 + P.energy * 4)), t);
+    filt.frequency.setTargetAtTime(cut, t + 0.002, 0.045 + P.cutoff * 0.08);
+    const amp = G(0); const subAmp = G(0);
+    const L = 0.5 * vel, gate = dur * 0.85;
+    for (const [a, lv] of [[amp, L], [subAmp, 0.75 * vel]]) {
+      a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(lv, t + 0.004);
+      a.gain.setValueAtTime(lv, t + gate); a.gain.setTargetAtTime(0, t + gate, 0.014);
+    }
+    const oscs = [];
+    for (const [type, mult, det, lvl] of [['sawtooth', 1, -P.detune, 0.5], ['sawtooth', 1, P.detune, 0.5], ['square', 0.5, 0, 0.3]]) {
+      const o = ac.createOscillator(); o.type = type; o.frequency.value = f * mult; o.detune.value = det;
+      const g = G(lvl); o.connect(g); g.connect(filt); oscs.push(o);
+    }
+    const sub = ac.createOscillator(); sub.type = 'sine'; sub.frequency.value = f / 2; sub.connect(subAmp); subAmp.connect(bSub); oscs.push(sub);
+    filt.connect(amp); amp.connect(bIn);
+    for (const o of oscs) { o.start(t); o.stop(t + gate + 0.15); }
+  }
+  function stab(t, deg) {
+    const base = 53 + semi(deg);
+    const filt = F('lowpass', 900, 3); const amp = G(0);
+    filt.frequency.setValueAtTime(3200, t); filt.frequency.setTargetAtTime(700, t + 0.002, 0.06);
+    amp.gain.setValueAtTime(0, t); amp.gain.linearRampToValueAtTime(0.12, t + 0.004); amp.gain.setTargetAtTime(0, t + 0.01, 0.09);
+    const dly = G(0.85), rv = G(0.5);
+    filt.connect(amp); amp.connect(duck); amp.connect(dly); dly.connect(dlySend); amp.connect(rv); rv.connect(revSend);
+    for (const iv of [0, 3, 7, 10]) for (const d of [-9, 9]) {
+      const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz(base + iv); o.detune.value = d;
+      o.connect(filt); o.start(t); o.stop(t + 0.6);
+    }
+  }
+
+  const TOMS = [110, 131, 147, 165, 196];
+  function playStep(s, t) {
+    const sd = 60 / W.bpm / 4;
+    const p = s % 16, bar = Math.floor(s / 16);
+    const tt = t + (s % 2 ? W.swing * sd * 0.6 : 0);
+    const E = P.energy;
+    const on = (ring) => {
+      const c = W.pat[ring][p];
+      if (c === 'x') return true;
+      if (c === 'o') return Math.random() < 0.3 + E * 0.65;
+      return false;
+    };
+    const fire = (ring, time) => events.push({ time, ring, step: p });
+
+    if (on(0)) { kick(t, 1); fire(0, t); }
+    if (on(1)) {
+      const deg = P.deg + (p === 14 && bar % 4 === 3 ? 4 : 0);
+      bass(tt, deg, W === WORLDS.INDUS ? sd * 1.2 : sd, p % 4 === 2 ? 1 : 0.75);
+      fire(1, tt);
+    }
+    if (on(2)) {
+      if (p % 4 === 2) hat(tt, 0.3, 0.2 + E * 0.15, 7000);
+      else hat(tt, 0.15 + (p % 2) * 0.05, W === WORLDS.GROOVE ? 0.12 : 0.035, W === WORLDS.GROOVE ? 6000 : 8500);
+      fire(2, tt);
+    } else if (Math.random() < E * 0.5) {
+      hat(tt, 0.1, 0.03, 9000);    // energy adds ghost hats
+    }
+    if (on(3)) {
+      if (W === WORLDS.INDUS) clap(tt, 0.75, 0.75);
+      else tom(tt, W === WORLDS.GROOVE ? 0.32 : 0.16, TOMS[(p + bar) % 5] * (W === WORLDS.HYPNO ? 1.6 : 1));
+      fire(3, tt);
+    }
+    if (on(4)) {
+      if (W.ring5 === 'STAB') stab(tt, P.deg);
+      else if (W.ring5 === 'CLAP') clap(tt, 0.55, 0.25);
+      else metalHit(tt, 0.55, 190 + (p * 37) % 240, 0.55);
+      fire(4, tt);
+    }
+  }
+  function schedule() {
+    if (nextT < ac.currentTime - 0.2) nextT = ac.currentTime + 0.03;
+    while (nextT < ac.currentTime + 0.12) {
+      playStep(step, nextT);
+      nextT += 60 / W.bpm / 4;
+      step++;
+    }
+  }
+  function setDelayTime() {
+    const t = 60 / W.bpm * 0.75;
+    dL.delayTime.setTargetAtTime(t, ac.currentTime, 0.05);
+    dR.delayTime.setTargetAtTime(t, ac.currentTime, 0.05);
+  }
+
+  return {
+    ac, P, events,
+    start() {
+      ac.resume();
+      setDelayTime();
+      nextT = ac.currentTime + 0.08; step = 0;
+      clearInterval(timer);
+      timer = setInterval(schedule, 25);
+      schedule();
+    },
+    stop() { clearInterval(timer); timer = null; events.length = 0; ac.suspend(); },
+    get running() { return !!timer; },
+    world() {
+      kSh.curve = makeCurve(W.kickDrive);
+      kRum.gain.setTargetAtTime(W.rumble * 1.4, ac.currentTime, 0.05);
+      setDelayTime();
+    },
+    update() {
+      const t = ac.currentTime;
+      if (Math.abs(P.grit - lastGrit) > 0.02) {
+        lastGrit = P.grit;
+        bSh.curve = makeCurve(1.5 + P.grit * 9);
+        bOut.gain.setTargetAtTime(0.85 / (1 + P.grit * 0.9), t, 0.03);
+        mPre.gain.setTargetAtTime(1 + P.grit * 0.45, t, 0.05);
+      }
+      const d = P.depth;
+      tone.frequency.setTargetAtTime(20000 * Math.pow(2, -d * 2.8), t, 0.06);
+      bSub.gain.setTargetAtTime(0.65 + (1 - d) * 0.45, t, 0.05);
+      revRet.gain.setTargetAtTime(0.18 + d * 1.5, t, 0.08);
+      dlyRet.gain.setTargetAtTime(0.12 + d * 0.9, t, 0.08);
+      fb.gain.setTargetAtTime(0.3 + d * 0.42, t, 0.08);
+      dRev.gain.setTargetAtTime(0.05 + d * 0.7, t, 0.08);
+    },
+    strike() {
+      const t = ac.currentTime + 0.005;
+      kick(t, 1);
+      metalHit(t, 1, 140 + Math.random() * 120, 0.9);
+      const n = noiseSrc(t, 2.4); const lp = F('lowpass', 9000); const g = G(0);
+      lp.frequency.setValueAtTime(9000, t); lp.frequency.exponentialRampToValueAtTime(250, t + 2.2);
+      g.gain.setValueAtTime(0.35, t); g.gain.exponentialRampToValueAtTime(0.001, t + 2.2);
+      n.connect(lp); lp.connect(g); g.connect(revSend); g.connect(bus);
+    },
+  };
+}
+
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const SCALE = [0, 2, 3, 5, 7, 8, 10];
+const degName = (deg) => NOTE_NAMES[(5 + SCALE[((deg % 7) + 7) % 7]) % 12];
+
+// ------------------------------------------------------------------ UI
+const intro = document.getElementById('intro');
+const soundBtn = document.getElementById('soundBtn');
+const strobeBtn = document.getElementById('strobeBtn');
+const bpmLabel = document.getElementById('bpmLabel');
+const beatLed = document.getElementById('beatLed');
+const flash = document.getElementById('flash');
+const depthMark = document.getElementById('depthMark');
+
+function startSound() {
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* not supported */ }
+  if (!audio) audio = createAudio();
+  audio.world();
+  audio.start();
+  soundBtn.textContent = 'SOUND AUS';
+  soundBtn.classList.add('hot');
+}
+function stopSound() {
+  if (audio) audio.stop();
+  soundBtn.textContent = 'SOUND AN';
+  soundBtn.classList.remove('hot');
+}
+document.getElementById('startBtn').addEventListener('click', () => { intro.hidden = true; startSound(); });
+document.getElementById('lookBtn').addEventListener('click', () => { intro.hidden = true; });
+soundBtn.addEventListener('click', () => { if (audio && audio.running) stopSound(); else startSound(); });
+function syncStrobe() { strobeBtn.setAttribute('aria-pressed', String(strobeOn)); strobeBtn.classList.toggle('hot', strobeOn); }
+strobeBtn.addEventListener('click', () => { strobeOn = !strobeOn; syncStrobe(); });
+syncStrobe();
+
+document.querySelectorAll('.worlds button').forEach((b) => {
+  b.addEventListener('click', () => {
+    W = WORLDS[b.dataset.world];
+    document.querySelectorAll('.worlds button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    bpmLabel.textContent = `${W.bpm} BPM`;
+    kickRings(2.5);
+    if (audio) audio.world();
+  });
+});
+
+const R = {};
+for (const id of ['vNote', 'bNote', 'vCut', 'bCut', 'vSpace', 'bSpace', 'vDrive', 'bDrive']) R[id] = document.getElementById(id);
+
+// ------------------------------------------------------------------ loop
+const clock = new THREE.Clock();
+let frame = 0, t = 0, visStep = -1;
+const params = { cutoff: 0.35, depth: 0.3, grit: 0.4, deg: 0 };
+const segColor = new THREE.Color();
+
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = Math.min(0.05, clock.getDelta());
+  t += dt;
+  frame++;
+
+  // rotation inertia + slow idle drift
+  if (S.mode !== 'rotate' || pointers.size !== 1) {
+    S.omega.multiplyScalar(Math.exp(-dt * 0.8));
+    const idle = reduceMotion ? 0.05 : 0.16;
+    if (S.omega.length() < idle) S.omega.y += (idle - S.omega.y) * dt * 0.5;
+    const w = S.omega.length();
+    if (w > 1e-5) { qTmp.setFromAxisAngle(S.omega.clone().normalize(), w * dt); gyro.quaternion.premultiply(qTmp); }
+  } else {
+    S.omega.multiplyScalar(Math.exp(-dt * 6));
+  }
+  // position spring (glides, overshoots a little)
+  if (pointers.size === 0) {
+    const a = new THREE.Vector3().subVectors(S.anchor, S.pos).multiplyScalar(30).addScaledVector(S.vel, -3.4);
+    S.vel.addScaledVector(a, dt);
+    S.pos.addScaledVector(S.vel, dt);
+    S.pos.z = clamp(S.pos.z, Z_FAR, Z_NEAR + 0.3);
+  } else {
+    S.vel.multiplyScalar(Math.exp(-dt * 8));
+  }
+  S.twistV *= Math.exp(-dt * 3.5);
+  S.strobe *= Math.exp(-dt * 14);
+
+  // beat clock: audio events when playing, internal clock otherwise
+  const sd = 60 / W.bpm / 4;
+  if (audio && audio.running) {
+    const now = audio.ac.currentTime;
+    while (audio.events.length && audio.events[0].time <= now) {
+      const ev = audio.events.shift();
+      rings[ev.ring].segs[ev.step].hit = 1;
+      if (ev.ring === 0) { S.pulse = 1; kickRings(0.35); frames.forEach((f, i) => { f.delay = i * 0.028; f.arm = 1; }); }
+      visStep = ev.step;
+    }
+  } else {
+    const st = Math.floor(t / sd);
+    if (st !== visStep) {
+      visStep = st;
+      const p = st % 16;
+      W.pat.forEach((pat, r) => { if (pat[p] === 'x') rings[r].segs[p].hit = 1; });
+      if (W.pat[0][p] === 'x') { S.pulse = 1; kickRings(0.35); frames.forEach((f, i) => { f.delay = i * 0.028; f.arm = 1; }); }
+    }
+  }
+  S.pulse *= Math.exp(-dt * 8);
+  beatLed.classList.toggle('on', S.pulse > 0.4);
+
+  const ang = S.omega.length();
+  const eTarget = clamp(ang * 0.18 + S.vel.length() * 0.3 + Math.abs(S.twistV) * 0.08 + S.strobe * 0.5, 0, 1);
+  S.energy += (eTarget - S.energy) * (1 - Math.exp(-dt * (eTarget > S.energy ? 10 : 2)));
+
+  // rings: own spin + springy swing (each ring a different pendulum)
+  const curStep = ((visStep % 16) + 16) % 16;
+  rings.forEach((r, i) => {
+    const k = 60 + i * 28, c = 1.6;
+    r.swingV += (-k * r.swing - c * r.swingV) * dt;
+    r.swing += r.swingV * dt;
+    r.spin.rotation.z += r.spinRate * dt * (1 + S.energy * 3);
+    r.spin.rotation.x = r.swing * 0.35;
+    r.spin.rotation.y = r.swing * 0.22;
+    const pat = W.pat[i];
+    r.segs.forEach((sg, s) => {
+      sg.hit *= Math.exp(-dt * 6);
+      const ch = pat[s];
+      const baseLevel = ch === 'x' ? 0.55 : ch === 'o' ? 0.22 : 0.06;
+      const head = s === curStep ? 0.25 : 0;
+      if (sg.hit > 0.02) segColor.copy(WHITE).lerp(ACCENT, 0.15).multiplyScalar(0.4 + sg.hit * 2.2);
+      else segColor.copy(WHITE).multiplyScalar(baseLevel + head);
+      if (sg.hit > 0.02 && i !== 2) segColor.lerp(ACCENT.clone().multiplyScalar(1 + sg.hit * 2), 0.65);
+      sg.mat.color.copy(segColor);
+    });
+  });
+  coreMat.color.copy(WHITE).multiplyScalar(0.8 + S.pulse * 2.5 + S.strobe * 3);
+  const sc = 1 + S.pulse * 0.025;
+  gyro.scale.setScalar(sc);
+  gyro.position.copy(S.pos);
+
+  // room: frames light up as a chase running away from you on every kick
+  frames.forEach((f) => {
+    if (f.arm) { f.delay -= dt; if (f.delay <= 0) { f.glow = 1; f.arm = 0; } }
+    f.glow *= Math.exp(-dt * 7);
+    f.mat.opacity = 0.06 + f.glow * (0.35 + S.energy * 0.4) + S.strobe * 0.5;
+  });
+  lasers.forEach((L, i) => {
+    L.line.rotation.z = L.base * (1.4 + Math.sin(t * 0.35 + L.phase) * 0.6) + Math.sin(t * 0.21) * 0.15;
+    L.line.rotation.x = Math.sin(t * 0.27 + L.phase) * 0.05;
+    L.mat.opacity = 0.1 + S.energy * 0.6 + S.pulse * 0.15 + S.strobe * 0.5;
+  });
+  mark.position.x = S.pos.x;
+  mark.position.z = S.pos.z;
+  mark.scale.setScalar(1 + S.pulse * 0.2);
+  markMat.opacity = 0.25 + S.pulse * 0.4;
+  markLine.position.set(S.pos.x, -2.58, S.pos.z);
+  markLine.scale.y = Math.max(0.01, S.pos.y + 2.58 - 2.2);
+  flash.style.opacity = strobeOn ? (S.strobe * 0.55).toFixed(3) : '0';
+
+  bloom.strength = 0.75 + S.energy * 0.5 + S.pulse * 0.15;
+  camera.position.x = Math.sin(t * 0.11) * 0.3 + S.pos.x * 0.15;
+  camera.position.y = 0.4 + Math.cos(t * 0.09) * 0.15 + S.pos.y * 0.1;
+  camera.lookAt(S.pos.x * 0.35, S.pos.y * 0.3, S.pos.z * 0.3);
+
+  // musical mapping — always in key, always on the grid
+  const zs = (CAM_Z - S.pos.z) / CAM_Z;
+  const nx = clamp(S.pos.x / (halfW * 0.75 * zs), -1, 1);
+  const ny = clamp(S.pos.y / (halfH * 0.5 * zs), -1, 1);
+  params.deg = Math.round(nx * 4);
+  params.cutoff = clamp(0.32 + ny * 0.24 + ang * 0.05 + S.energy * 0.25, 0.05, 1);
+  params.depth = clamp((Z_NEAR - S.pos.z) / (Z_NEAR - Z_FAR), 0, 1);
+  params.grit = clamp(0.15 + (1 - params.depth) * 0.75 + Math.abs(S.twistV) * 0.03, 0, 1);
+  if (audio) {
+    const P = audio.P;
+    P.cutoff += (params.cutoff - P.cutoff) * 0.25;
+    P.grit = params.grit;
+    P.depth += (params.depth - P.depth) * 0.15;
+    P.deg = params.deg;
+    P.reso = clamp(0.25 + Math.abs(S.twistV) * 0.06, 0, 1);
+    P.detune = 8 + Math.abs(S.twistV) * 6 + params.grit * 8;
+    P.energy = S.energy;
+    if (frame % 3 === 0) audio.update();
+  }
+
+  if (frame % 4 === 0) {
+    R.vNote.textContent = degName(params.deg);
+    R.bNote.style.width = ((params.deg + 4) / 8 * 100).toFixed(0) + '%';
+    R.vCut.textContent = Math.round(params.cutoff * 100);
+    R.bCut.style.width = (params.cutoff * 100).toFixed(0) + '%';
+    R.vSpace.textContent = Math.round(params.depth * 100);
+    R.bSpace.style.width = (params.depth * 100).toFixed(0) + '%';
+    R.vDrive.textContent = Math.round(params.grit * 100);
+    R.bDrive.style.width = (params.grit * 100).toFixed(0) + '%';
+    depthMark.style.top = (params.depth * 100).toFixed(1) + '%';
+  }
+
+  composer.render();
+}
+tick();
+</script>
