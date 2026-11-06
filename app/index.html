@@ -29,6 +29,7 @@
         <button type="button" id="modePlay" aria-pressed="true">FELD</button>
         <button type="button" id="modeSound" aria-pressed="false">SOUND</button>
         <button type="button" id="modeSet" aria-pressed="false">SET</button>
+        <button type="button" id="modeVox" aria-pressed="false">VOX</button>
       </div>
       <i id="beatLed"></i>
     </div>
@@ -39,6 +40,7 @@
       <button class="world" id="worldBtn" type="button" aria-label="Klangwelt wechseln"><b id="worldName">W01 · HYPNOTIC</b> ▸</button>
       <span id="tempo">132 BPM · F MIN</span>
     </div>
+    <div class="dna" id="dna">RUMBLE-KICK · ROLLENDER SUB · DUB-AKKORDE</div>
     <div class="main">
       <div class="voice" id="voiceName">BASS</div>
       <canvas id="scope" aria-hidden="true"></canvas>
@@ -50,7 +52,7 @@
     </div>
     <div class="steps" id="steps"></div>
     <div class="song">
-      <div class="row"><span>SONG <b id="songNum">01</b> · <span class="sec" id="secName">INTRO</span></span><span id="songTime">00:00 / 03:40</span></div>
+      <div class="row"><span>SONG <b id="songNum">01</b> · <span class="sec" id="secName">INTRO</span></span><span class="songright"><span id="songTime">00:00 / 03:40</span><button type="button" class="next" id="nextBtn" aria-label="Nächsten Song einleiten">NEXT ▸▸</button></span></div>
       <div class="songbar" id="songbar"></div>
     </div>
   </div>
@@ -82,11 +84,36 @@
     </div>
   </div>
 
+  <div class="vox" id="vox" hidden>
+    <div class="top"><span><b>STIMME</b> · COMPUTER</span><span id="voxStatus">BEREIT</span></div>
+    <div class="voxsay">
+      <label class="sr" for="voxText">Text</label>
+      <input id="voxText" type="text" maxlength="120" autocomplete="off" spellcheck="false" value="Willkommen im Maschinenraum">
+      <button type="button" id="voxSay">SPRICH</button>
+    </div>
+    <div class="chips" id="voxChips"></div>
+    <div class="voxslot">
+      <span class="lbl">SET-START</span>
+      <label class="sr" for="voxIntro">Text zum Set-Start</label>
+      <input id="voxIntro" type="text" maxlength="120" autocomplete="off" spellcheck="false" value="Willkommen im Maschinenraum. Field eins online.">
+      <button type="button" class="tog" id="voxIntroOn" aria-pressed="true">AN</button>
+    </div>
+    <div class="voxslot">
+      <span class="lbl">ÜBERGANG</span>
+      <label class="sr" for="voxTrans">Texte für Übergänge, mit / getrennt</label>
+      <input id="voxTrans" type="text" maxlength="200" autocomplete="off" spellcheck="false" value="Nächste Übertragung / Neues Signal / Keep moving">
+      <button type="button" class="tog" id="voxTransOn" aria-pressed="true">AN</button>
+    </div>
+    <div class="models" id="voxModels" role="group" aria-label="Stimmklang"></div>
+    <div class="knobs small" id="voxKnobs"></div>
+  </div>
+
   <div class="voices" role="group" aria-label="Stimme">
     <button class="key" type="button" data-voice="DRUMS" aria-pressed="false"><span class="led"></span>DRUMS</button>
     <button class="key" type="button" data-voice="BASS" aria-pressed="true"><span class="led"></span>BASS</button>
     <button class="key" type="button" data-voice="SYNTH" aria-pressed="false"><span class="led"></span>SYNTH</button>
     <button class="key" type="button" data-voice="NOISE" aria-pressed="false"><span class="led"></span>NOISE</button>
+    <button class="key auto" type="button" data-voice="AUTO" aria-pressed="false"><span class="led"></span>AUTO</button>
   </div>
 
   <div class="trans">
@@ -110,6 +137,7 @@
   </div>
 </div>
 <!-- BODY END -->
+<script src="voice.js"></script>
 <script src="field.js"></script>
 <script>
   if ('serviceWorker' in navigator && location.protocol === 'https:') {

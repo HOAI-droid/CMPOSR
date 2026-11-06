@@ -37,7 +37,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 .head i { width: 6px; height: 6px; border-radius: 999px; background: #3a2418; display: inline-block; }
 .head i.on { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .mode { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
-.mode button { height: 30px; padding: 0 12px; border: 0; background: transparent; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); }
+.mode button { height: 30px; padding: 0 9px; border: 0; background: transparent; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); }
 .mode button[aria-pressed="true"] { background: var(--key-on); color: var(--fg); }
 
 .disp {
@@ -93,7 +93,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 .knob.active .n { color: var(--accent); }
 .sound .note { margin: 0; font-family: var(--mono); font-size: 9px; line-height: 1.5; color: var(--muted); padding: 0 2px; }
 
-.voices { grid-area: voices; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.voices { grid-area: voices; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .key {
   height: 60px; border-radius: 14px; border: 1px solid var(--line); background: var(--key);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 0 #0a0a0a;
@@ -117,6 +117,38 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 .ribbon .track::before { content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 2px; background: var(--line); }
 .ribbon .fill { position: absolute; left: 0; top: 8px; height: 2px; background: var(--accent); }
 .ribbon .thumb { position: absolute; top: 0; width: 6px; height: 18px; margin-left: -3px; border-radius: 2px; background: var(--fg); }
+
+/* DNA line, NEXT */
+.disp .dna { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: #b7b4ad; margin-top: -4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.songright { display: flex; align-items: center; gap: 8px; }
+.next { height: 26px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line); background: #141414; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--fg); position: relative; }
+.next::after { content: ""; position: absolute; inset: -9px -4px; }
+.next.armed { border-color: var(--accent); color: var(--accent); }
+.key.auto[aria-pressed="true"] .led { width: 30px; }
+
+/* VOX view */
+.vox { grid-area: field; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); box-shadow: inset 0 2px 14px rgba(0,0,0,0.65); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto; }
+.vox .top { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); padding: 2px 2px 0; }
+.vox .top b { color: var(--fg); font-weight: 500; }
+.vox .top .live { color: var(--accent); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.vox input { min-width: 0; flex: 1; height: 44px; box-sizing: border-box; border-radius: 10px; border: 1px solid var(--line); background: var(--oled); color: var(--fg); font-family: var(--mono); font-size: 13px; padding: 0 12px; outline: none; -webkit-user-select: text; user-select: text; }
+.vox input:focus { border-color: var(--accent); }
+.voxsay { display: flex; gap: 6px; }
+.voxsay button { width: 84px; flex: none; height: 44px; border-radius: 10px; border: 1px solid var(--accent); background: var(--key-on); color: var(--accent); font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; }
+.chips { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; flex: none; padding-bottom: 2px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chips button { flex: none; white-space: nowrap; }
+.chips button { height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--key); font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: #c9c6bf; }
+.voxslot { display: flex; align-items: center; gap: 6px; }
+.voxslot .lbl { width: 72px; flex: none; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--muted); }
+.voxslot input { font-size: 11px; height: 40px; }
+.tog { width: 52px; flex: none; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--key); font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); }
+.tog[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.knobs.small { flex: none; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: auto; }
+.knobs.small .knob { padding: 8px 4px; }
+.knobs.small .knob svg { width: min(100%, 64px); max-height: 64px; }
+.knobs.small .knob .n { font-size: 10px; }
 
 /* REC key, VOL knob */
 .rec { flex-direction: column; gap: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); }
@@ -162,6 +194,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
     column-gap: 18px;
   }
   .voices { grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; }
+  .voices .auto { grid-column: span 2; }
   .key { height: 88px; }
   .knobs { grid-auto-rows: minmax(180px, 1fr); }
   .knob svg { width: min(100%, 150px); max-height: 150px; }

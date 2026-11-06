@@ -42,7 +42,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 .head i { width: 6px; height: 6px; border-radius: 999px; background: #3a2418; display: inline-block; }
 .head i.on { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .mode { display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
-.mode button { height: 30px; padding: 0 12px; border: 0; background: transparent; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); }
+.mode button { height: 30px; padding: 0 9px; border: 0; background: transparent; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); }
 .mode button[aria-pressed="true"] { background: var(--key-on); color: var(--fg); }
 
 .disp {
@@ -98,7 +98,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 .knob.active .n { color: var(--accent); }
 .sound .note { margin: 0; font-family: var(--mono); font-size: 9px; line-height: 1.5; color: var(--muted); padding: 0 2px; }
 
-.voices { grid-area: voices; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.voices { grid-area: voices; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .key {
   height: 60px; border-radius: 14px; border: 1px solid var(--line); background: var(--key);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 0 #0a0a0a;
@@ -122,6 +122,38 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 .ribbon .track::before { content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 2px; background: var(--line); }
 .ribbon .fill { position: absolute; left: 0; top: 8px; height: 2px; background: var(--accent); }
 .ribbon .thumb { position: absolute; top: 0; width: 6px; height: 18px; margin-left: -3px; border-radius: 2px; background: var(--fg); }
+
+/* DNA line, NEXT */
+.disp .dna { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: #b7b4ad; margin-top: -4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.songright { display: flex; align-items: center; gap: 8px; }
+.next { height: 26px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line); background: #141414; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--fg); position: relative; }
+.next::after { content: ""; position: absolute; inset: -9px -4px; }
+.next.armed { border-color: var(--accent); color: var(--accent); }
+.key.auto[aria-pressed="true"] .led { width: 30px; }
+
+/* VOX view */
+.vox { grid-area: field; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); box-shadow: inset 0 2px 14px rgba(0,0,0,0.65); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto; }
+.vox .top { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); padding: 2px 2px 0; }
+.vox .top b { color: var(--fg); font-weight: 500; }
+.vox .top .live { color: var(--accent); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.vox input { min-width: 0; flex: 1; height: 44px; box-sizing: border-box; border-radius: 10px; border: 1px solid var(--line); background: var(--oled); color: var(--fg); font-family: var(--mono); font-size: 13px; padding: 0 12px; outline: none; -webkit-user-select: text; user-select: text; }
+.vox input:focus { border-color: var(--accent); }
+.voxsay { display: flex; gap: 6px; }
+.voxsay button { width: 84px; flex: none; height: 44px; border-radius: 10px; border: 1px solid var(--accent); background: var(--key-on); color: var(--accent); font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; }
+.chips { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; flex: none; padding-bottom: 2px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chips button { flex: none; white-space: nowrap; }
+.chips button { height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--key); font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: #c9c6bf; }
+.voxslot { display: flex; align-items: center; gap: 6px; }
+.voxslot .lbl { width: 72px; flex: none; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--muted); }
+.voxslot input { font-size: 11px; height: 40px; }
+.tog { width: 52px; flex: none; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--key); font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); }
+.tog[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.knobs.small { flex: none; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: auto; }
+.knobs.small .knob { padding: 8px 4px; }
+.knobs.small .knob svg { width: min(100%, 64px); max-height: 64px; }
+.knobs.small .knob .n { font-size: 10px; }
 
 /* REC key, VOL knob */
 .rec { flex-direction: column; gap: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); }
@@ -167,6 +199,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
     column-gap: 18px;
   }
   .voices { grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; }
+  .voices .auto { grid-column: span 2; }
   .key { height: 88px; }
   .knobs { grid-auto-rows: minmax(180px, 1fr); }
   .knob svg { width: min(100%, 150px); max-height: 150px; }
@@ -191,6 +224,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
         <button type="button" id="modePlay" aria-pressed="true">FELD</button>
         <button type="button" id="modeSound" aria-pressed="false">SOUND</button>
         <button type="button" id="modeSet" aria-pressed="false">SET</button>
+        <button type="button" id="modeVox" aria-pressed="false">VOX</button>
       </div>
       <i id="beatLed"></i>
     </div>
@@ -201,6 +235,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
       <button class="world" id="worldBtn" type="button" aria-label="Klangwelt wechseln"><b id="worldName">W01 · HYPNOTIC</b> ▸</button>
       <span id="tempo">132 BPM · F MIN</span>
     </div>
+    <div class="dna" id="dna">RUMBLE-KICK · ROLLENDER SUB · DUB-AKKORDE</div>
     <div class="main">
       <div class="voice" id="voiceName">BASS</div>
       <canvas id="scope" aria-hidden="true"></canvas>
@@ -212,7 +247,7 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
     </div>
     <div class="steps" id="steps"></div>
     <div class="song">
-      <div class="row"><span>SONG <b id="songNum">01</b> · <span class="sec" id="secName">INTRO</span></span><span id="songTime">00:00 / 03:40</span></div>
+      <div class="row"><span>SONG <b id="songNum">01</b> · <span class="sec" id="secName">INTRO</span></span><span class="songright"><span id="songTime">00:00 / 03:40</span><button type="button" class="next" id="nextBtn" aria-label="Nächsten Song einleiten">NEXT ▸▸</button></span></div>
       <div class="songbar" id="songbar"></div>
     </div>
   </div>
@@ -244,11 +279,36 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
     </div>
   </div>
 
+  <div class="vox" id="vox" hidden>
+    <div class="top"><span><b>STIMME</b> · COMPUTER</span><span id="voxStatus">BEREIT</span></div>
+    <div class="voxsay">
+      <label class="sr" for="voxText">Text</label>
+      <input id="voxText" type="text" maxlength="120" autocomplete="off" spellcheck="false" value="Willkommen im Maschinenraum">
+      <button type="button" id="voxSay">SPRICH</button>
+    </div>
+    <div class="chips" id="voxChips"></div>
+    <div class="voxslot">
+      <span class="lbl">SET-START</span>
+      <label class="sr" for="voxIntro">Text zum Set-Start</label>
+      <input id="voxIntro" type="text" maxlength="120" autocomplete="off" spellcheck="false" value="Willkommen im Maschinenraum. Field eins online.">
+      <button type="button" class="tog" id="voxIntroOn" aria-pressed="true">AN</button>
+    </div>
+    <div class="voxslot">
+      <span class="lbl">ÜBERGANG</span>
+      <label class="sr" for="voxTrans">Texte für Übergänge, mit / getrennt</label>
+      <input id="voxTrans" type="text" maxlength="200" autocomplete="off" spellcheck="false" value="Nächste Übertragung / Neues Signal / Keep moving">
+      <button type="button" class="tog" id="voxTransOn" aria-pressed="true">AN</button>
+    </div>
+    <div class="models" id="voxModels" role="group" aria-label="Stimmklang"></div>
+    <div class="knobs small" id="voxKnobs"></div>
+  </div>
+
   <div class="voices" role="group" aria-label="Stimme">
     <button class="key" type="button" data-voice="DRUMS" aria-pressed="false"><span class="led"></span>DRUMS</button>
     <button class="key" type="button" data-voice="BASS" aria-pressed="true"><span class="led"></span>BASS</button>
     <button class="key" type="button" data-voice="SYNTH" aria-pressed="false"><span class="led"></span>SYNTH</button>
     <button class="key" type="button" data-voice="NOISE" aria-pressed="false"><span class="led"></span>NOISE</button>
+    <button class="key auto" type="button" data-voice="AUTO" aria-pressed="false"><span class="led"></span>AUTO</button>
   </div>
 
   <div class="trans">
@@ -273,6 +333,230 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 </div>
 
 <script>
+/* FIELD-1 voice: a small formant speech synthesiser.
+ * German letter-to-sound rules, a monotone buzz source and three formant filters.
+ * It is deliberately robotic; the metallic character is added later by the voice FX chain.
+ * window.F1Voice.render(text, { pitch, speed }) -> Promise<AudioBuffer>
+ */
+(() => {
+'use strict';
+
+// vowel formants F1, F2, F3 (Hz)
+const VOW = {
+  a: [760, 1300, 2500], e: [400, 2150, 2750], E: [590, 1820, 2560], '@': [500, 1500, 2500],
+  i: [280, 2280, 2950], I: [390, 1960, 2600], o: [410, 780, 2480], O: [590, 960, 2450],
+  u: [300, 690, 2300], U: [390, 960, 2300], y: [280, 1760, 2200], Y: [390, 1620, 2220],
+  2: [410, 1450, 2250], 6: [660, 1320, 2420],
+};
+// consonants: voiced buzz level (va), formant colour (f), noise band [lo, hi, level], duration (ms)
+const CON = {
+  m: { va: 0.45, f: [260, 1100, 2200], dur: 70 },
+  n: { va: 0.45, f: [260, 1650, 2600], dur: 65 },
+  N: { va: 0.42, f: [260, 2000, 2700], dur: 70 },
+  l: { va: 0.55, f: [360, 1100, 2650], dur: 60 },
+  R: { va: 0.45, f: [520, 1250, 2300], dur: 55, n: [700, 1700, 0.12] },
+  j: { va: 0.5, f: [280, 2200, 2900], dur: 55 },
+  v: { va: 0.3, f: [300, 1200, 2300], dur: 65, n: [1400, 5000, 0.2] },
+  z: { va: 0.25, f: [300, 1500, 2500], dur: 85, n: [4500, 9000, 0.4] },
+  f: { va: 0, dur: 90, n: [1500, 8000, 0.32] },
+  s: { va: 0, dur: 100, n: [4500, 9500, 0.55] },
+  S: { va: 0, dur: 105, n: [1900, 6000, 0.6] },
+  C: { va: 0, dur: 95, n: [2800, 6800, 0.42] },
+  x: { va: 0, dur: 95, n: [900, 2700, 0.4] },
+  h: { va: 0, dur: 60, n: [500, 3200, 0.22] },
+  p: { stop: true, va: 0, closure: 75, n: [400, 1900, 0.45] },
+  t: { stop: true, va: 0, closure: 65, n: [3000, 7500, 0.55] },
+  k: { stop: true, va: 0, closure: 75, n: [1400, 3600, 0.55] },
+  b: { stop: true, va: 0.12, closure: 50, n: [400, 1900, 0.25] },
+  d: { stop: true, va: 0.12, closure: 45, n: [2500, 6500, 0.3] },
+  g: { stop: true, va: 0.12, closure: 55, n: [1300, 3300, 0.3] },
+};
+
+// words that do not follow German spelling (English club words, brand names)
+const DICT = {
+  welcome: 'wellkamm', to: 'tu', the: 'de', machine: 'maschien', system: 'sistem', online: 'onlain',
+  body: 'boddi', music: 'mjusik', techno: 'tekno', next: 'nekst', transmission: 'tränsmischn',
+  field: 'fiild', cmposr: 'kompouser', composer: 'kompouser', set: 'set', start: 'start', go: 'gou',
+  are: 'ar', you: 'ju', ready: 'reddi', access: 'äkzess', granted: 'grentid', move: 'muuf',
+  keep: 'kiip', moving: 'muuwing', no: 'nou', sleep: 'sliip', till: 'till', monday: 'mandei',
+  berlin: 'berlin', club: 'klabb', sound: 'saund', drop: 'dropp', bass: 'bäis', rave: 'reiv',
+  dance: 'dääns', night: 'nait', initiating: 'inischieiting', sequence: 'siekwens', deploying: 'diploiing',
+  new: 'nju', pattern: 'pättern', signal: 'signal', lost: 'lost', we: 'wie', is: 'iss', this: 'diss',
+  and: 'änd', of: 'ov', in: 'in', a: 'ä', control: 'kontroul', human: 'hjuman', robot: 'roubot',
+  data: 'deita', loading: 'louding', error: 'ärror', power: 'pauer', up: 'app', down: 'daun',
+};
+const DIGITS = ['null', 'eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun'];
+
+const isV = (ch) => !!ch && 'aeiouyäöü'.includes(ch);
+const VMAP = { a: ['a', 'a'], e: ['e', 'E'], i: ['i', 'I'], o: ['o', 'O'], u: ['u', 'U'], y: ['y', 'Y'], ä: ['E', 'E'], ö: ['2', '2'], ü: ['y', 'Y'] };
+
+function g2p(raw) {
+  const word = DICT[raw] || raw;
+  const out = [];
+  const push = (...ps) => { for (const p of ps) out.push({ p }); };
+  const vow = (p, long) => out.push({ p, v: true, long });
+  let i = 0;
+  while (i < word.length) {
+    const rest = word.slice(i);
+    const start = i === 0;
+    const at = (k) => word[i + k] || '';
+    if (rest.startsWith('tsch')) { push('t', 'S'); i += 4; continue; }
+    if (rest.startsWith('sch')) { push('S'); i += 3; continue; }
+    if (rest.startsWith('ch')) { const prev = word[i - 1]; push(start ? 'k' : prev && 'aou'.includes(prev) ? 'x' : 'C'); i += 2; continue; }
+    if (rest.startsWith('ck')) { push('k'); i += 2; continue; }
+    if (rest.startsWith('ph')) { push('f'); i += 2; continue; }
+    if (rest.startsWith('pf')) { push('p', 'f'); i += 2; continue; }
+    if (rest.startsWith('qu')) { push('k', 'v'); i += 2; continue; }
+    if (rest.startsWith('th')) { push('t'); i += 2; continue; }
+    if (rest.startsWith('ng')) { push('N'); i += 2; continue; }
+    if (rest.startsWith('nk')) { push('N', 'k'); i += 2; continue; }
+    if (rest.startsWith('tz')) { push('t', 's'); i += 2; continue; }
+    if (rest.startsWith('ss')) { push('s'); i += 2; continue; }
+    if (rest[0] === 'ß') { push('s'); i += 1; continue; }
+    if (start && (rest.startsWith('sp') || rest.startsWith('st'))) { push('S', rest[1]); i += 2; continue; }
+    if (/^(ei|ai|ay|ey)/.test(rest)) { vow('a', false); vow('I', false); i += 2; continue; }
+    if (/^(eu|äu|oi)/.test(rest)) { vow('O', false); vow('Y', false); i += 2; continue; }
+    if (rest.startsWith('au')) { vow('a', false); vow('U', false); i += 2; continue; }
+    if (rest.startsWith('ie')) { vow('i', true); i += 2; continue; }
+    if (rest === 'er' && i > 0) { vow('6', false); i += 2; continue; }
+    if (rest === 'e' && i > 0) { vow('@', false); i += 1; continue; }
+    if (rest === 'en' && i > 1) { vow('@', false); push('n'); i += 2; continue; }
+    const ch = rest[0];
+    if (isV(ch)) {
+      let long;
+      if (at(1) === ch || (at(1) === 'h' && !isV(at(2)))) { long = true; i += 2; }
+      else {
+        let j = i + 1, cons = 0;
+        while (j < word.length && !isV(word[j])) { cons++; j++; }
+        long = cons === 0 || (cons === 1 && j < word.length);
+        i += 1;
+      }
+      vow(VMAP[ch][long ? 0 : 1], long);
+      continue;
+    }
+    if (at(1) === ch) i++; // doubled consonant = one sound
+    const nextV = isV(at(1));
+    switch (ch) {
+      case 's': push((start && nextV) || (i > 0 && isV(word[i - 1]) && nextV) ? 'z' : 's'); break;
+      case 'z': push('t', 's'); break;
+      case 'x': push('k', 's'); break;
+      case 'v': push('f'); break;
+      case 'w': push('v'); break;
+      case 'c': if (at(1) === 'e' || at(1) === 'i') push('t', 's'); else push('k'); break;
+      case 'r': push('R'); break;
+      case 'h': if (nextV) push('h'); break;
+      case 'b': case 'd': case 'g': push(i === word.length - 1 ? { b: 'p', d: 't', g: 'k' }[ch] : ch); break;
+      default: if (CON[ch]) push(ch);
+    }
+    i++;
+  }
+  return out;
+}
+
+// text -> list of timed segments
+function build(text, speed) {
+  const clean = text.toLowerCase()
+    .replace(/\d/g, (d) => ' ' + DIGITS[+d] + ' ')
+    .replace(/[^a-zäöüß.,!?;:\- ]/g, ' ');
+  const tokens = clean.match(/[a-zäöüß]+|[.,!?;:]/g) || [];
+  const segs = [];
+  const k = 1 / speed;
+  let lastF = VOW['@'];
+  for (const tok of tokens) {
+    if (/[.,!?;:]/.test(tok)) { segs.push({ dur: (tok === ',' ? 0.17 : 0.32) * k, va: 0, f: lastF }); continue; }
+    for (const ph of g2p(tok)) {
+      if (ph.v) {
+        const f = VOW[ph.p];
+        const dur = (ph.p === '@' ? 0.065 : ph.long ? 0.155 : 0.09) * k;
+        segs.push({ dur, va: 1, f });
+        lastF = f;
+        continue;
+      }
+      const c = CON[ph.p];
+      if (!c) continue;
+      if (c.stop) {
+        segs.push({ dur: (c.closure / 1000) * k, va: c.va, f: lastF });
+        segs.push({ dur: 0.018 * k, va: c.va, f: lastF, n: [c.n[0], c.n[1], c.n[2] * 1.4] });
+        if (!c.va) segs.push({ dur: 0.025 * k, va: 0, f: lastF, n: [600, 3500, 0.15] });
+      } else {
+        segs.push({ dur: (c.dur / 1000) * k, va: c.va, f: c.f || lastF, n: c.n });
+        if (c.f) lastF = c.f;
+      }
+    }
+    segs.push({ dur: 0.045 * k, va: 0, f: lastF });
+  }
+  return segs;
+}
+
+async function render(text, opts = {}) {
+  const pitch = opts.pitch || 88;
+  const speed = opts.speed || 1;
+  const sr = 24000;
+  const segs = build(text, speed);
+  if (!segs.length) return null;
+  const total = segs.reduce((a, s) => a + s.dur, 0) + 0.35;
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const ctx = new OAC(1, Math.ceil(total * sr), sr);
+
+  const src = ctx.createOscillator();
+  src.type = 'sawtooth';
+  src.frequency.value = pitch;
+  const voiceG = ctx.createGain();
+  voiceG.gain.value = 0;
+  src.connect(voiceG);
+  const sum = ctx.createGain();
+  sum.gain.value = 1;
+  const forms = [0, 1, 2].map((n) => {
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.Q.value = [5, 9, 12][n];
+    f.frequency.value = VOW['@'][n];
+    const g = ctx.createGain();
+    g.gain.value = [1.8, 1.6, 1.0][n];
+    voiceG.connect(f); f.connect(g); g.connect(sum);
+    return f;
+  });
+  const nb = ctx.createBuffer(1, sr, sr);
+  { const d = nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const ns = ctx.createBufferSource(); ns.buffer = nb; ns.loop = true;
+  const nHP = ctx.createBiquadFilter(); nHP.type = 'highpass'; nHP.frequency.value = 2000;
+  const nLP = ctx.createBiquadFilter(); nLP.type = 'lowpass'; nLP.frequency.value = 6000;
+  const nG = ctx.createGain(); nG.gain.value = 0;
+  ns.connect(nHP); nHP.connect(nLP); nLP.connect(nG); nG.connect(sum);
+  sum.connect(ctx.destination);
+
+  let t = 0.06;
+  for (const s of segs) {
+    const te = t + s.dur;
+    const glide = Math.min(0.035, s.dur * 0.45);
+    forms.forEach((f, n) => { f.frequency.linearRampToValueAtTime(s.f[n], t + glide); f.frequency.setValueAtTime(s.f[n], te); });
+    voiceG.gain.linearRampToValueAtTime(s.va, t + Math.min(0.012, s.dur * 0.3));
+    voiceG.gain.setValueAtTime(s.va, te);
+    if (s.n) {
+      nHP.frequency.setValueAtTime(s.n[0], t);
+      nLP.frequency.setValueAtTime(s.n[1], t);
+      nG.gain.linearRampToValueAtTime(s.n[2], t + Math.min(0.01, s.dur * 0.3));
+      nG.gain.setValueAtTime(s.n[2], te);
+    } else {
+      nG.gain.linearRampToValueAtTime(0, t + 0.008);
+      nG.gain.setValueAtTime(0, te);
+    }
+    t = te;
+  }
+  voiceG.gain.linearRampToValueAtTime(0, t + 0.04);
+  nG.gain.linearRampToValueAtTime(0, t + 0.02);
+  src.start(0); ns.start(0);
+  const buf = await ctx.startRendering();
+  const d = buf.getChannelData(0);
+  let peak = 0;
+  for (let i = 0; i < d.length; i++) peak = Math.max(peak, Math.abs(d[i]));
+  if (peak > 0) for (let i = 0; i < d.length; i++) d[i] *= 0.9 / peak;
+  return buf;
+}
+
+window.F1Voice = { render, g2p };
+})();
+
 /* CMPOSR FIELD-1
  * Generative techno instrument: a song engine (arrangement, 4-bar loops, song-to-song transitions,
  * smooth genre changes) plus a theremin-like field to play over it. Everything is synthesised live.
@@ -299,10 +583,11 @@ const DRUM_LABELS = ['MIN', 'HAT', 'OPEN', 'PERC', 'RIDE', 'CLAP', 'METL', 'MAX'
 
 // ============================================================ worlds
 const WORLDS = {
-  HYPNO:  { id: 'W01', name: 'HYPNOTIC',   bpm: 132, bpmVar: 3, swing: 0.02, hat: 0.55, ride: 0, perc: [3, 5], percPitch: 1.6, clap: 0.4, metal: 0.15, bass: 'roll',  stab: 0.7,  noise: 0.35, sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
-  GROOVE: { id: 'W02', name: 'HARDGROOVE', bpm: 144, bpmVar: 3, swing: 0.13, hat: 0.8,  ride: 1, perc: [5, 7], percPitch: 1,   clap: 1,   metal: 0.3,  bass: 'off2',  stab: 0.25, noise: 0.25, sound: { DRUMS: 1, BASS: 0, SYNTH: 0, NOISE: 0 } },
-  INDUS:  { id: 'W03', name: 'INDUSTRIAL', bpm: 150, bpmVar: 4, swing: 0,    hat: 0.75, ride: 0, perc: [3, 4], percPitch: 0.8, clap: 1,   metal: 0.85, bass: 'reese', stab: 0.1,  noise: 0.6,  sound: { DRUMS: 2, BASS: 2, SYNTH: 1, NOISE: 1 } },
-  DUB:    { id: 'W04', name: 'DUB',        bpm: 124, bpmVar: 3, swing: 0.2,  hat: 0.35, ride: 0, perc: [3, 3], percPitch: 1.3, clap: 0.3, metal: 0,    bass: 'off',   stab: 1,    noise: 0.35, sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
+  HYPNO:  { id: 'W01', name: 'HYPNOTIC', dna: 'RUMBLE-KICK · ROLLENDER SUB · DUB-AKKORDE',   bpm: 132, bpmVar: 3, swing: 0.02, hat: 0.55, ride: 0, perc: [3, 5], percPitch: 1.6, clap: 0.4, metal: 0.15, bass: 'roll',  stab: 0.7,  noise: 0.35, sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
+  GROOVE: { id: 'W02', name: 'HARDGROOVE', dna: 'PERKUSSIVE LOOPS · RIDE · SWING · TOMS', bpm: 144, bpmVar: 3, swing: 0.13, hat: 0.8,  ride: 1, perc: [5, 7], percPitch: 1,   clap: 1,   metal: 0.3,  bass: 'off2',  stab: 0.25, noise: 0.25, sound: { DRUMS: 1, BASS: 0, SYNTH: 0, NOISE: 0 } },
+  INDUS:  { id: 'W03', name: 'INDUSTRIAL', dna: 'CLIPPENDE KICK · METALL · VERZERRTER BASS', bpm: 150, bpmVar: 4, swing: 0,    hat: 0.75, ride: 0, perc: [3, 4], percPitch: 0.8, clap: 1,   metal: 0.85, bass: 'reese', stab: 0.1,  noise: 0.6,  sound: { DRUMS: 2, BASS: 2, SYNTH: 1, NOISE: 1 } },
+  DUB:    { id: 'W04', name: 'DUB', dna: 'DUB-CHORDS · ECHO · TIEFER SUB · SWING',        bpm: 124, bpmVar: 3, swing: 0.2,  hat: 0.35, ride: 0, perc: [3, 3], percPitch: 1.3, clap: 0.3, metal: 0,    bass: 'off',   stab: 1,    noise: 0.35, sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
+  DETROIT: { id: 'W05', name: 'DETROIT', dna: 'GEBROCHENE BEATS · 808 · STRINGS · ELECTRO', bpm: 130, bpmVar: 4, swing: 0.06, hat: 0.75, ride: 0, perc: [4, 6], percPitch: 1.2, clap: 1, metal: 0.1, bass: 'electro', stab: 0.85, noise: 0.2, kick: 'broken', sound: { DRUMS: 1, BASS: 0, SYNTH: 2, NOISE: 1 } },
 };
 const WORLD_KEYS = Object.keys(WORLDS);
 
@@ -355,8 +640,14 @@ function genSong(wk, prev) {
     P.hat[x] = i % 2 === 1 ? w.hat : i % 4 === 0 ? w.hat * 0.5 : (w.hat > 0.7 ? w.hat * 0.7 : 0);
     if (w.ride && i % 2 === 0) P.ride[x] = i % 4 === 2 ? 1 : 0.8;
   }
-  if (wk === 'INDUS' || R() < 0.4) P.kick[63] = 0.5;
-  if (R() < 0.3) P.kick[46] = 0.4;
+  if (w.kick === 'broken') {
+    const KP = [[0, 6, 10], [0, 7, 10], [0, 3, 10, 12], [0, 6, 9, 14]];
+    const ka = pick(KP), kb = pick(KP);
+    for (let b = 0; b < 4; b++) for (let i = 0; i < 16; i++) P.kick[b * 16 + i] = (b === 3 ? kb : ka).includes(i) ? 1 : 0;
+  } else {
+    if (wk === 'INDUS' || R() < 0.4) P.kick[63] = 0.5;
+    if (R() < 0.3) P.kick[46] = 0.4;
+  }
 
   const k = w.perc[0] + Math.floor(R() * (w.perc[1] - w.perc[0] + 1));
   const ea = euclid(k, 16, Math.floor(R() * 4));
@@ -374,6 +665,7 @@ function genSong(wk, prev) {
   }
   // bass rhythm + a 4-bar progression
   const style = w.bass;
+  s.electro = pick([[0, 3, 6, 10, 14], [0, 6, 8, 11, 14], [2, 3, 7, 10, 11, 14]]);
   const prog = pick([[0, 0, 0, 0], [0, 0, 0, -2], [0, 0, 3, 0], [0, 0, 0, 4], [0, -2, 0, 3], [0, 0, 5, 4], [0, 0, -3, -2]]);
   for (let b = 0; b < 4; b++) for (let i = 0; i < 16; i++) {
     const x = b * 16 + i, q = i % 4;
@@ -382,6 +674,7 @@ function genSong(wk, prev) {
     else if (style === 'off') v = q === 2 ? 1 : 0;
     else if (style === 'off2') v = q === 2 || q === 3 ? 1 : 0;
     else if (style === 'reese') v = q === 2 ? 1 : (i % 8 === 7 ? 0.5 : 0);
+    else if (style === 'electro') v = s.electro.includes(i) ? 1 : 0;
     P.bass[x] = v;
     P.notes[x] = prog[b] + (q !== 2 && R() < 0.12 ? pick([7, 2, -3, 4]) : 0);
   }
@@ -402,7 +695,12 @@ function genSong(wk, prev) {
   if (wk === 'INDUS' && R() < 0.3) s.sound.NOISE = 0;
   if (R() < 0.15) s.sound.BASS = 1;
   s.knobs = {
-    DRUMS: { weight: 0.4 + R() * 0.3, grit: wk === 'INDUS' ? 0.6 + R() * 0.3 : 0.2 + R() * 0.3, motion: 0.25 + R() * 0.3, space: 0.25 + R() * 0.3 },
+    DRUMS: {
+      weight: wk === 'DETROIT' ? 0.8 + R() * 0.2 : 0.4 + R() * 0.3,
+      grit: wk === 'INDUS' ? 0.65 + R() * 0.3 : wk === 'DETROIT' ? 0.1 + R() * 0.15 : 0.2 + R() * 0.3,
+      motion: wk === 'GROOVE' ? 0.5 + R() * 0.3 : 0.25 + R() * 0.3,
+      space: wk === 'HYPNO' ? 0.6 + R() * 0.3 : wk === 'DETROIT' ? 0.1 + R() * 0.15 : 0.25 + R() * 0.3,
+    },
     BASS: { weight: 0.5 + R() * 0.3, grit: wk === 'INDUS' ? 0.6 + R() * 0.3 : 0.25 + R() * 0.3, motion: 0.35 + R() * 0.35, space: 0.1 + R() * 0.15 },
     SYNTH: { weight: 0.3 + R() * 0.5, grit: R() * 0.3, motion: 0.3 + R() * 0.4, space: 0.5 + R() * 0.3 },
     NOISE: { weight: 0.3 + R() * 0.4, grit: wk === 'INDUS' ? 0.6 : 0.3 + R() * 0.3, motion: 0.4 + R() * 0.3, space: 0.4 + R() * 0.4 },
@@ -442,10 +740,12 @@ function relax(song) {
 
 // ============================================================ arrangement
 function makePlan() {
-  return [
-    ['INTRO', 16], ['GROOVE', pick([8, 16])], ['BUILD', 8], ['PEAK', pick([16, 24])],
-    ['BREAK', pick([8, 16])], ['PEAK II', pick([24, 32])], ['OUTRO', 16],
-  ].map(([name, bars]) => ({ name, bars }));
+  const T = pick([1, 2, 2, 3, 3]);
+  let p;
+  if (T === 1) p = [['INTRO', 16], ['GROOVE', pick([8, 16])], ['BUILD', 8], ['PEAK', pick([16, 24])], ['BREAK', pick([8, 16])], ['PEAK II', pick([24, 32])], ['OUTRO', 16]];
+  else if (T === 2) p = [['INTRO', 16], ['GROOVE', 16], ['PEAK', 16], ['BASS SOLO', pick([4, 8])], ['REBUILD', 16], ['PEAK II', pick([16, 24])], ['OUTRO', 16]];
+  else p = [['INTRO', 16], ['GROOVE', pick([8, 16])], ['HALFTIME', 8], ['BUILD', 8], ['PEAK', pick([16, 24])], ['BASS SOLO', 4], ['REBUILD', 8], ['PEAK II', 16], ['OUTRO', 16]];
+  return p.map(([name, bars]) => ({ name, bars }));
 }
 const ALL = { kick: 1, hat: 1, open: 1, perc: 1, ride: 1, clap: 1, metal: 1, bass: 1, stab: 1, noise: 1, pad: 0, extra: 0 };
 function sectionLayers(name, k) {
@@ -456,6 +756,9 @@ function sectionLayers(name, k) {
     case 'PEAK': return { ...ALL };
     case 'BREAK': return { ...ALL, kick: 0, hat: k < 0.5 ? 0 : 0.5, open: 0, perc: 0.5, ride: 0, clap: 0, metal: 0, bass: 0, stab: 0, pad: 1 };
     case 'PEAK II': return { ...ALL, extra: 1 };
+    case 'BASS SOLO': return { kick: 0, hat: 0, open: 0, perc: 0, ride: 0, clap: 0, metal: 0, bass: 1, stab: 0, noise: 0.3, pad: 0, extra: 0, bassLong: 1 };
+    case 'REBUILD': return { ...ALL, kick: k >= 0.125 ? 1 : 0, hat: k >= 0.25 ? 1 : 0, open: k >= 0.375 ? 1 : 0, perc: k >= 0.5 ? 1 : 0, ride: k >= 0.625 ? 1 : 0, clap: k >= 0.75 ? 1 : 0, metal: k >= 0.875 ? 1 : 0, stab: k >= 0.5 ? 0.6 : 0, noise: 0.4 };
+    case 'HALFTIME': return { ...ALL, half: 1, open: 0, ride: 0, metal: 0, perc: 0.5, stab: 0, pad: 1, noise: 0.5 };
     case 'OUTRO': return { ...ALL, hat: k < 0.75 ? 1 : 0.5, open: k < 0.5 ? 1 : 0, perc: k < 0.625 ? 1 : 0, ride: k < 0.25 ? 1 : 0, clap: k < 0.375 ? 1 : 0, metal: k < 0.25 ? 0.5 : 0, bass: k < 0.5 ? 1 : 0, stab: k < 0.25 ? 0.5 : 0, noise: 0.4 };
     default: return { ...ALL };
   }
@@ -466,6 +769,9 @@ function sectionMaster(name, k) {
   if (name === 'BUILD') return { lp: 1, hp: k * k * 0.62 };
   if (name === 'BREAK') return { lp: 0.72, hp: k > 0.5 ? (k - 0.5) * 2 * 0.5 : 0 };
   if (name === 'OUTRO') return { lp: 1 - k * 0.65, hp: 0 };
+  if (name === 'BASS SOLO') return { lp: 0.42 + k * 0.4, hp: 0 };
+  if (name === 'REBUILD') return { lp: 0.72 + 0.28 * k, hp: k > 0.75 ? (k - 0.75) * 4 * 0.35 : 0 };
+  if (name === 'HALFTIME') return { lp: 0.8, hp: 0 };
   return { lp: 1, hp: 0 };
 }
 // genre change: 8-bar DJ-style blend
@@ -478,11 +784,14 @@ function transLayers(k) {
 const state = {
   voice: 'BASS', mode: 'PLAY', playing: false, evolve: 0.4,
   touch: null, home: 0,
-  vals: { DRUMS: 0.4, BASS: 0.42, SYNTH: 0.45, NOISE: 0.3 },
+  vals: { DRUMS: 0.4, BASS: 0.42, SYNTH: 0.45, NOISE: 0.3, AUTO: 0.5 },
+  lastVoice: 'BASS',
+  auto: { y: 0.5, ty: 0.5 },
 };
 const seq = {
   song: genSong('HYPNO', null), next: null, plan: makePlan(), sec: 0, secBar: -1, songBar: -1, step16: 0,
   bpm: 132, ramp: null, trans: null, pendingWorld: null, songTime: 0, totalBars: 0, worldKey: 'HYPNO',
+  nextReq: false, skipNow: false, nextByUser: false,
 };
 seq.bpm = seq.song.bpm;
 const ui = {};
@@ -561,6 +870,7 @@ function createAudio() {
   const bIn = Gn(1); const bSh = shaper(2); const bHP = F('highpass', 28); const bOut = Gn(0.8); const bSub = Gn(0.9);
   bIn.connect(bSh); bSh.connect(bHP); bHP.connect(bOut); bOut.connect(duck); bSub.connect(duck);
   const bSend = Gn(0.05); bOut.connect(bSend); bSend.connect(dlySend);
+  const bRum = Gn(0); bOut.connect(bRum); bSub.connect(bRum); bRum.connect(rumSend);
   // synth
   const sIn = Gn(1); const sSh = shaper(1.2); const sOut = Gn(1); sIn.connect(sSh); sSh.connect(sOut); sOut.connect(duck);
   const sDly = Gn(0.6), sRev = Gn(0.4); sOut.connect(sDly); sDly.connect(dlySend); sOut.connect(sRev); sRev.connect(revSend);
@@ -568,6 +878,19 @@ function createAudio() {
   const nIn = Gn(1); const nCrush = ac.createWaveShaper(); nCrush.curve = makeCrush(6); const nOut = Gn(0.8);
   nIn.connect(nCrush); nCrush.connect(nOut); nOut.connect(bus);
   const nRev = Gn(0.5); nOut.connect(nRev); nRev.connect(revSend);
+
+  // computer voice: highpass -> ring modulator -> distortion -> bitcrush -> band -> comb (metal) -> master
+  const vIn = Gn(1); const vHP = F('highpass', 140);
+  const vDry = Gn(1), vWet = Gn(0), ring = Gn(0);
+  const ringOsc = ac.createOscillator(); ringOsc.type = 'sine'; ringOsc.frequency.value = 72; ringOsc.connect(ring.gain); ringOsc.start();
+  const vSum = Gn(1); const vSh = shaper(3, '2x'); const vCrush = ac.createWaveShaper(); vCrush.curve = makeCrush(8);
+  const vBP = F('bandpass', 1500, 0.25); const vPost = Gn(1.6);
+  const comb = ac.createDelay(0.05); comb.delayTime.value = 0.0062; const combFb = Gn(0.55); const combG = Gn(0.5);
+  const vOut = Gn(0.9); const vDly = Gn(0.3), vRev = Gn(0.3);
+  vIn.connect(vHP); vHP.connect(vDry); vHP.connect(ring); ring.connect(vWet); vDry.connect(vSum); vWet.connect(vSum);
+  vSum.connect(vSh); vSh.connect(vCrush); vCrush.connect(vBP); vBP.connect(vPost); vPost.connect(vOut);
+  vPost.connect(comb); comb.connect(combFb); combFb.connect(comb); comb.connect(combG); combG.connect(vOut);
+  vOut.connect(mDrive); vOut.connect(vDly); vDly.connect(dlySend); vOut.connect(vRev); vRev.connect(revSend);
 
   const events = [];
   const fire = (time, voice, lane, vel = 1) => events.push({ time, voice, lane, vel });
@@ -757,6 +1080,15 @@ function createAudio() {
     mHP.frequency.exponentialRampToValueAtTime(Math.max(18, hpF), t + barDur);
   }
   function startRamp(to, bars) { seq.ramp = { from: seq.bpm, to, steps: bars * 16, pos: 0 }; }
+  function enterSection(t, prevSecName, barDur) {
+    const sec = seq.plan[seq.sec], name = sec.name;
+    if (name === 'OUTRO') { seq.next = genSong(seq.song.world, seq.song); startRamp(seq.next.bpm, sec.bars + 4); if (api.onOutro) api.onOutro(); }
+    if (name === 'BUILD') riser(t, barDur * sec.bars);
+    if ((name === 'PEAK' || name === 'PEAK II') && ['BUILD', 'BREAK', 'REBUILD'].includes(prevSecName)) impact(t);
+    if (name === 'BASS SOLO') impact(t);
+    if (name === 'PEAK II') { relax(seq.song); mutate(seq.song, 0.9); }
+    bRum.gain.setTargetAtTime(name === 'BASS SOLO' ? 0.9 : 0, t, name === 'BASS SOLO' ? 0.1 : 1.5);
+  }
 
   function onBar(t) {
     const prevSecName = seq.plan[seq.sec] ? seq.plan[seq.sec].name : '';
@@ -782,7 +1114,8 @@ function createAudio() {
         applySongSound(seq.song, ['BASS', 'SYNTH', 'NOISE']);
         impact(t);
         jumped = true;
-        if (A && A.onSongStart) A.onSongStart(t, seq.song);
+        bRum.gain.setTargetAtTime(0, t, 0.3);
+        if (A) A.songStarted(t, seq.song);
       } else {
         const k = (tr.bar + 1) / tr.bars;
         setMaster(t, { lp: 1, hp: k > 0.5 ? (k - 0.5) * 2 * 0.55 : 0 }, barDur);
@@ -791,24 +1124,34 @@ function createAudio() {
       }
     }
 
+    // NEXT pressed: wind down now (short outro); pressed again during the outro: cut to the next song
+    if (!jumped && seq.nextReq) {
+      seq.nextReq = false;
+      const oi = seq.plan.length - 1;
+      if (seq.sec !== oi) { seq.plan[oi].bars = 8; seq.sec = oi; seq.secBar = 0; enterSection(t, prevSecName, barDur); }
+    }
+    if (!jumped && seq.skipNow) { seq.skipNow = false; seq.secBar = seq.plan[seq.sec].bars; }
+
     // section / song progression
     if (!jumped && seq.secBar >= seq.plan[seq.sec].bars) {
       seq.sec++; seq.secBar = 0;
       if (seq.sec >= seq.plan.length) {
         seq.song = seq.next || genSong(seq.song.world, seq.song);
-        seq.next = null;
+        seq.next = null; seq.nextByUser = false;
         seq.plan = makePlan(); seq.sec = 0; seq.songBar = 0; seq.songTime = 0;
         applySongSound(seq.song);
-        if (A && A.onSongStart) A.onSongStart(t, seq.song);
+        if (A) A.songStarted(t, seq.song);
       }
-      const name = seq.plan[seq.sec].name;
-      if (name === 'OUTRO') { seq.next = genSong(seq.song.world, seq.song); startRamp(seq.next.bpm, seq.plan[seq.sec].bars + 4); }
-      if (name === 'BUILD') riser(t, barDur * seq.plan[seq.sec].bars);
-      if ((name === 'PEAK' || name === 'PEAK II') && (prevSecName === 'BUILD' || prevSecName === 'BREAK')) impact(t);
-      if (name === 'PEAK II') { relax(seq.song); mutate(seq.song, 0.9); }
+      enterSection(t, prevSecName, barDur);
     }
     const sec = seq.plan[seq.sec];
     if (sec.name === 'BREAK' && seq.secBar === Math.floor(sec.bars / 2)) riser(t, barDur * (sec.bars - seq.secBar));
+    if (sec.name === 'REBUILD' && seq.secBar === sec.bars - 4) riser(t, barDur * 4);
+    // AUTO pilot: drifts energy and the home note while nobody touches the field
+    if (state.voice === 'AUTO' && !state.touch) {
+      if (seq.songBar % 2 === 0) state.auto.ty = clamp(state.auto.ty + (R() - 0.45) * 0.45, 0.15, 0.95);
+      if (seq.songBar % 8 === 0) state.home = clamp(state.home + pick([-2, -1, 0, 0, 1, 2, 3]), 0, 6);
+    }
 
     // evolve once per loop, relax every 16 bars
     if (seq.songBar % 4 === 0 && seq.songBar > 0 && R() < 0.35 + state.evolve * 0.65) mutate(seq.song, state.evolve);
@@ -840,18 +1183,24 @@ function createAudio() {
     const touch = state.touch;
     const v = state.vals;
     const lastBarOf = (n) => seq.secBar % n === n - 1;
+    const isAuto = !!touch && touch.voice === 'AUTO';
+    const tDrums = !!touch && (touch.voice === 'DRUMS' || isAuto);
+    const tBass = !!touch && (touch.voice === 'BASS' || isAuto);
+    const tSynth = !!touch && (touch.voice === 'SYNTH' || (isAuto && touch.y > 0.45));
+    const tNoise = !!touch && (touch.voice === 'NOISE' || (isAuto && touch.y > 0.72));
 
     // DRUMS — arrangement decides, a finger on DRUMS overrides the layer stack
     let D = { kick: L.kick, hat: L.hat, open: L.open, perc: L.perc, ride: L.ride, clap: L.clap, metal: L.metal, extra: L.extra };
-    if (touch && touch.voice === 'DRUMS') {
-      const n = touch.lane;
+    if (tDrums) {
+      const n = isAuto ? Math.round(clamp(touch.y, 0, 1) * 7) : touch.lane;
       D = { kick: 1, hat: n >= 1 ? 1 : 0, open: n >= 2 ? 1 : 0, perc: n >= 3 ? 1 : 0, ride: n >= 4 ? 1 : 0, clap: n >= 5 ? 1 : 0, metal: n >= 6 ? 1 : 0, extra: n >= 7 ? 1 : 0 };
     }
     const dv = (layer) => src(layer).live[layer][lp] * (D[layer] ?? 0);
     const buildEnd = !tr && (secName === 'BUILD') && lastBarOf(seq.plan[seq.sec].bars) && p >= 12;
-    if (hitP(dv('kick')) && !buildEnd) { kick(t, 1); fire(t, 'DRUMS', 0); }
+    const half = L.half && !tDrums;
+    if (half ? (p === 0 || p === 8) : (hitP(dv('kick')) && !buildEnd)) { kick(t, 1); fire(t, 'DRUMS', 0); }
     if (D.extra && p % 4 === 3 && R() < 0.4) kick(tt, 0.5);
-    if (hitP(dv('hat'))) { hat(tt, 0.15 + (p % 2) * 0.05, 0.03 + v.DRUMS * 0.03, 8500); fire(tt, 'DRUMS', 1, 0.5); }
+    if (half ? p % 4 === 2 && R() < 0.8 : hitP(dv('hat'))) { hat(tt, 0.15 + (p % 2) * 0.05, 0.03 + v.DRUMS * 0.03, 8500); fire(tt, 'DRUMS', 1, 0.5); }
     else if (D.hat && R() < sound.DRUMS.motion * 0.25) hat(tt, 0.08, 0.025, 9500);
     if (hitP(dv('open'))) { hat(tt, 0.28, 0.14 + v.DRUMS * 0.2, 7000); fire(tt, 'DRUMS', 2); }
     if (hitP(dv('perc'))) {
@@ -860,7 +1209,7 @@ function createAudio() {
       fire(tt, 'DRUMS', 3);
     }
     if (hitP(dv('ride'))) { hat(tt, 0.1, 0.26, 5400); fire(tt, 'DRUMS', 4, 0.4); }
-    if (hitP(dv('clap'))) { clap(tt, 0.6, 0.25 + v.DRUMS * 0.4); fire(tt, 'DRUMS', 5); }
+    if (half ? p === 12 : hitP(dv('clap'))) { clap(tt, half ? 0.75 : 0.6, half ? 0.7 : 0.25 + v.DRUMS * 0.4); fire(tt, 'DRUMS', 5); }
     if (hitP(dv('metal'))) { metalHit(tt, 0.45, 190 + (lp * 37) % 240, 0.5, 3); fire(tt, 'DRUMS', 6); }
     if (D.extra && R() < 0.35) hat(tt, 0.08, 0.025, 9500);
     // fills: clap rolls at phrase ends, a full roll into drops
@@ -869,8 +1218,15 @@ function createAudio() {
     if (tr && tr.bar === tr.bars - 1 && p >= 8) clap(tt, 0.15 + p * 0.04, 0.3);
 
     // BASS
-    if (touch && touch.voice === 'BASS') {
+    if (tBass) {
       if (p % 4 !== 0) { bass(tt, touch.lane, sd, p % 4 === 2 ? 1 : 0.75, v.BASS); fire(tt, 'BASS', touch.lane); }
+    } else if (L.bassLong || half) {
+      // slow passages: long notes that thunder through the rumble chain
+      if (p === 0 || p === 8) {
+        const deg = clamp(state.home + src('bass').live.notes[lp - p], -3, 11);
+        bass(tt, deg, sd * 7.5, 1, L.bassLong ? clamp(0.25 + kSec * 0.5, 0, 1) : v.BASS);
+        fire(tt, 'BASS', clamp(deg, 0, 7), 1);
+      }
     } else if (hitP(val('bass'))) {
       const deg = clamp(state.home + src('bass').live.notes[lp], -3, 11);
       bass(tt, deg, sd, p % 4 === 2 ? 1 : 0.72, v.BASS);
@@ -879,7 +1235,7 @@ function createAudio() {
 
     // SYNTH
     const sm = sound.SYNTH.model;
-    if (touch && touch.voice === 'SYNTH') {
+    if (tSynth) {
       if (sm === 0) {
         const arp = [0, 2, 4, 6, 7, 4, 2, 4];
         const fast = sound.SYNTH.motion > 0.55 || v.SYNTH > 0.75;
@@ -901,7 +1257,7 @@ function createAudio() {
     }
 
     // NOISE
-    if (touch && touch.voice === 'NOISE') {
+    if (tNoise) {
       if (p % 2 === 1 && R() < 0.15 + v.NOISE * 0.5 + sound.NOISE.motion * 0.3) { noiseHit(tt, touch.lane, 0.5 + v.NOISE * 0.4); fire(tt, 'NOISE', touch.lane); }
     } else {
       const nv = val('noise') * (0.5 + sound.NOISE.motion);
@@ -928,8 +1284,32 @@ function createAudio() {
   }
 
   let last = {};
-  return {
-    ac, analyser, events, stepQueue: [], recTap, onSongStart: null,
+  const api = {
+    ac, analyser, events, stepQueue: [], recTap, onSongStart: null, onOutro: null, songListeners: [],
+    songStarted(t, song) { if (this.onSongStart) this.onSongStart(t, song); for (const fn of this.songListeners) fn(t, song); },
+    nextBarTime() { const sd = stepDur(); return Math.max(ac.currentTime + 0.05, nextT + ((16 - seq.step16) % 16) * sd); },
+    nextBeatTime() { const sd = stepDur(); return Math.max(ac.currentTime + 0.03, nextT + ((4 - (seq.step16 % 4)) % 4) * sd); },
+    voiceModel(m, grit, metal, space) {
+      const t = ac.currentTime;
+      const P = [
+        { wet: 0.45 + metal * 0.5, fb: 0.45 + metal * 0.4, comb: 0.35 + metal * 0.5, drive: 2 + grit * 6, bits: 9 - grit * 3, bp: 1500, q: 0.25 },
+        { wet: 0.25 + metal * 0.4, fb: 0.25 + metal * 0.35, comb: 0.2 + metal * 0.3, drive: 6 + grit * 16, bits: 7 - grit * 3, bp: 1600, q: 0.35 },
+        { wet: 0.2 + metal * 0.4, fb: 0.2 + metal * 0.3, comb: 0.15 + metal * 0.3, drive: 3 + grit * 8, bits: 7 - grit * 2, bp: 1500, q: 1.3 },
+      ][m];
+      vWet.gain.setTargetAtTime(P.wet, t, 0.02); vDry.gain.setTargetAtTime(1 - P.wet * 0.8, t, 0.02);
+      combFb.gain.setTargetAtTime(Math.min(0.85, P.fb), t, 0.02); combG.gain.setTargetAtTime(P.comb, t, 0.02);
+      vSh.curve = makeCurve(P.drive); vCrush.curve = makeCrush(Math.round(P.bits));
+      vBP.frequency.setTargetAtTime(P.bp, t, 0.02); vBP.Q.setTargetAtTime(P.q, t, 0.02);
+      vPost.gain.setTargetAtTime(1.6 / (1 + P.drive * 0.06), t, 0.02);
+      vDly.gain.setTargetAtTime(space * 0.8, t, 0.05); vRev.gain.setTargetAtTime(0.1 + space * 0.9, t, 0.05);
+      ringOsc.frequency.setTargetAtTime(40 + metal * 90, t, 0.02);
+    },
+    speak(buf, t) {
+      const src = ac.createBufferSource(); src.buffer = buf; src.connect(vIn); src.start(t);
+      const dur = buf.duration;
+      bus.gain.cancelScheduledValues(t); bus.gain.setTargetAtTime(0.55, t, 0.08); bus.gain.setTargetAtTime(1, t + dur, 0.5);
+      return dur;
+    },
     setVolume(v) { out.gain.setTargetAtTime(v * v * 1.1, ac.currentTime, 0.03); },
     start() {
       ac.resume();
@@ -978,6 +1358,7 @@ function createAudio() {
       else noiseHit(t, state.home, 0.7);
     },
   };
+  return api;
 }
 
 // ============================================================ UI
@@ -999,7 +1380,17 @@ function setPlaying(on) {
   ensureAudio();
   if (!on && typeof REC !== 'undefined' && REC.active) recStop();
   state.playing = on;
-  if (on) { A.setVolume(volume); A.start(); } else A.stop();
+  if (on) {
+    A.setVolume(volume); A.start();
+    applyVox();
+    if (!A.voxHooked) {
+      A.voxHooked = true;
+      A.songListeners.push((t) => { if (vox.trans) voxSay(nextTransPhrase(), t + 0.02); });
+      A.onOutro = prepareTransition;
+    }
+    // set start: the intro line lands on the second bar
+    if (vox.intro && $('voxIntro').value.trim()) voxSay($('voxIntro').value, () => A.nextBarTime() + (60 / seq.bpm) * 4);
+  } else A.stop();
   keepAwake(on);
   $('playBtn').setAttribute('aria-pressed', String(on));
   $('playBtn').setAttribute('aria-label', on ? 'Stop' : 'Play');
@@ -1025,15 +1416,34 @@ $('worldBtn').addEventListener('click', () => {
   ui.dirty = true;
 });
 
+// NEXT: wind the current song down and bring in the next one (tap again during the outro = cut now)
+$('nextBtn').addEventListener('click', () => {
+  if (!state.playing) {
+    seq.song = genSong(seq.worldKey, seq.song);
+    seq.plan = makePlan(); seq.sec = 0; seq.secBar = -1; seq.songBar = -1; seq.step16 = 0; seq.songTime = 0;
+    seq.bpm = seq.song.bpm; seq.ramp = null;
+    applySongSound(seq.song);
+  } else if (seq.trans) {
+    return;
+  } else if (seq.plan[seq.sec].name === 'OUTRO') {
+    seq.skipNow = true;
+  } else {
+    seq.nextReq = true; seq.nextByUser = true;
+  }
+  ui.dirty = true;
+});
+
 function setVoice(v) {
   state.voice = v;
+  if (v !== 'AUTO') state.lastVoice = v;
   document.querySelectorAll('.key').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.voice === v)));
   $('voiceName').textContent = v;
-  $('yLabel').textContent = { DRUMS: '↑ DRUCK · DRIVE + HALL', BASS: '↑ KLANG · FILTER + GRIT', SYNTH: '↑ HELL · FILTER + ECHO', NOISE: '↑ DICHTE · METALL + RAUM' }[v];
-  $('lblA').firstChild.textContent = { DRUMS: 'LAYER', BASS: 'CUT', SYNTH: 'TONE', NOISE: 'DENS' }[v];
-  $('lblB').firstChild.textContent = { DRUMS: 'DRIVE', BASS: 'GRIT', SYNTH: 'MODEL', NOISE: 'MODEL' }[v];
+  $('yLabel').textContent = { DRUMS: '↑ DRUCK · DRIVE + HALL', BASS: '↑ KLANG · FILTER + GRIT', SYNTH: '↑ HELL · FILTER + ECHO', NOISE: '↑ DICHTE · METALL + RAUM', AUTO: '↑ ENERGIE · ALLE STIMMEN · LOSLASSEN = AUTOPILOT' }[v];
+  $('lblA').firstChild.textContent = { DRUMS: 'LAYER', BASS: 'CUT', SYNTH: 'TONE', NOISE: 'DENS', AUTO: 'ENERGY' }[v];
+  $('lblB').firstChild.textContent = { DRUMS: 'DRIVE', BASS: 'GRIT', SYNTH: 'MODEL', NOISE: 'MODEL', AUTO: 'DRUMS' }[v];
   renderSound();
 }
+const sv = () => (state.voice === 'AUTO' ? state.lastVoice : state.voice);
 document.querySelectorAll('.key').forEach((k) => k.addEventListener('click', () => setVoice(k.dataset.voice)));
 
 // mode: FELD / SOUND
@@ -1042,9 +1452,11 @@ function setMode(m) {
   $('modePlay').setAttribute('aria-pressed', String(m === 'PLAY'));
   $('modeSound').setAttribute('aria-pressed', String(m === 'SOUND'));
   $('modeSet').setAttribute('aria-pressed', String(m === 'SET'));
+  $('modeVox').setAttribute('aria-pressed', String(m === 'VOX'));
   fieldEl.hidden = m !== 'PLAY';
   $('sound').hidden = m !== 'SOUND';
   $('set').hidden = m !== 'SET';
+  $('vox').hidden = m !== 'VOX';
   if (m === 'SET' && typeof renderRecList === 'function') renderRecList();
   if (m === 'PLAY') requestAnimationFrame(resize);
   renderSound();
@@ -1052,6 +1464,7 @@ function setMode(m) {
 $('modePlay').addEventListener('click', () => setMode('PLAY'));
 $('modeSound').addEventListener('click', () => setMode('SOUND'));
 $('modeSet').addEventListener('click', () => setMode('SET'));
+$('modeVox').addEventListener('click', () => setMode('VOX'));
 
 // ---------------------------------------------------------- SOUND view
 const knobEls = {};
@@ -1081,10 +1494,10 @@ function buildKnobs() {
     let startY = 0, startX = 0, startV = 0, lastTap = 0;
     tile.addEventListener('pointerdown', (e) => {
       tile.setPointerCapture(e.pointerId);
-      startY = e.clientY; startX = e.clientX; startV = sound[state.voice][key];
+      startY = e.clientY; startX = e.clientX; startV = sound[sv()][key];
       tile.classList.add('active');
       const now = performance.now();
-      if (now - lastTap < 300) { setKnob(key, DEFAULT_SOUND[state.voice][key]); }
+      if (now - lastTap < 300) { setKnob(key, DEFAULT_SOUND[sv()][key]); }
       lastTap = now;
     });
     tile.addEventListener('pointermove', (e) => {
@@ -1095,13 +1508,13 @@ function buildKnobs() {
     tile.addEventListener('pointerup', up); tile.addEventListener('pointercancel', up);
     tile.addEventListener('keydown', (e) => {
       const d = e.key === 'ArrowUp' || e.key === 'ArrowRight' ? 0.05 : e.key === 'ArrowDown' || e.key === 'ArrowLeft' ? -0.05 : 0;
-      if (d) { setKnob(key, sound[state.voice][key] + d); e.preventDefault(); }
+      if (d) { setKnob(key, sound[sv()][key] + d); e.preventDefault(); }
     });
   });
 }
 function setKnob(key, v) {
-  sound[state.voice][key] = clamp(v, 0, 1);
-  locked[state.voice] = true;
+  sound[sv()][key] = clamp(v, 0, 1);
+  locked[sv()] = true;
   renderSound();
 }
 function buildModels() {
@@ -1110,14 +1523,14 @@ function buildModels() {
     const b = document.createElement('button');
     b.type = 'button';
     b.addEventListener('click', () => {
-      sound[state.voice].model = i; locked[state.voice] = true; renderSound();
-      if (A) A.preview(state.voice);
+      sound[sv()].model = i; locked[sv()] = true; renderSound();
+      if (A) A.preview(sv());
     });
     wrap.appendChild(b);
   }
 }
 function renderSound() {
-  const v = state.voice, S = sound[v];
+  const v = sv(), S = sound[v];
   $('sndVoice').textContent = v;
   $('sndLock').textContent = locked[v] ? 'MANUELL · BLEIBT BEI SONGWECHSEL' : 'AUTO · WECHSELT MIT DEM SONG';
   [...$('models').children].forEach((b, i) => { b.textContent = MODELS[v][i]; b.setAttribute('aria-pressed', String(S.model === i)); });
@@ -1179,11 +1592,17 @@ function fieldInput(e) {
   const x = clamp(e.clientX - r.left, 0, fw), y = clamp(e.clientY - r.top, 0, fh - PAD_B);
   const lane = laneFromX(x);
   finger.x = x; finger.y = y;
-  state.vals[state.voice] = yVal(y);
-  if (state.voice === 'BASS' || state.voice === 'SYNTH') state.home = lane;
-  if (!state.touch || state.touch.lane !== lane || state.touch.voice !== state.voice) {
-    state.touch = { voice: state.voice, lane, changed: true };
+  const yv = yVal(y);
+  state.vals[state.voice] = yv;
+  if (state.voice === 'AUTO') {
+    state.vals.DRUMS = 0.2 + yv * 0.6; state.vals.BASS = 0.15 + yv * 0.75; state.vals.SYNTH = 0.25 + yv * 0.65; state.vals.NOISE = yv;
+    state.auto.y = state.auto.ty = yv;
   }
+  if (state.voice === 'BASS' || state.voice === 'SYNTH' || state.voice === 'AUTO') state.home = lane;
+  if (!state.touch || state.touch.lane !== lane || state.touch.voice !== state.voice) {
+    state.touch = { voice: state.voice, lane, changed: true, y: yv };
+  }
+  state.touch.y = yv;
   trail.push({ x, y, lane, t: performance.now() });
 }
 fieldEl.addEventListener('pointerdown', (e) => {
@@ -1227,6 +1646,12 @@ function renderDisplay() {
     $('worldName').textContent = `${w.id} · ${w.name}`;
   }
   $('tempo').textContent = `${Math.round(seq.bpm)} BPM · ${keyName(song.root)} MIN`;
+  const dnaW = seq.trans ? WORLDS[seq.trans.to.world] : seq.pendingWorld ? WORLDS[seq.pendingWorld] : w;
+  $('dna').textContent = dnaW.dna;
+  const nb = $('nextBtn');
+  const inOutro = !seq.trans && seq.plan[seq.sec] && seq.plan[seq.sec].name === 'OUTRO';
+  nb.classList.toggle('armed', seq.nextReq || seq.skipNow || (inOutro && seq.nextByUser));
+  nb.textContent = seq.skipNow ? 'GLEICH ▸▸' : inOutro ? 'JETZT ▸▸' : 'NEXT ▸▸';
   $('songNum').textContent = String(song.num).padStart(2, '0');
   $('secName').textContent = seq.trans ? 'ÜBERGANG' : (seq.plan[seq.sec] ? seq.plan[seq.sec].name : 'INTRO');
   if (ui.planRef !== seq.plan) renderSongbar();
@@ -1267,15 +1692,23 @@ function draw() {
   stepSpans.forEach((s, i) => s.classList.toggle('on', i === curStep));
   if (frameCount % 6 === 0 || ui.dirty) { renderDisplay(); ui.dirty = false; }
 
+  if (state.voice === 'AUTO' && !state.touch && state.playing) {
+    const a = state.auto;
+    a.y += (a.ty - a.y) * 0.015;
+    state.vals.AUTO = a.y;
+    state.vals.DRUMS = 0.2 + a.y * 0.6; state.vals.BASS = 0.15 + a.y * 0.75; state.vals.SYNTH = 0.25 + a.y * 0.65; state.vals.NOISE = a.y * 0.8;
+  }
   const v = state.vals[state.voice];
   const root = seq.song.root;
   const lane = state.touch ? state.touch.lane : state.home;
   $('vNote').textContent = state.voice === 'DRUMS' ? (state.touch ? DRUM_LABELS[lane] : 'AUTO') : degName(lane, root);
   $('vA').textContent = state.voice === 'DRUMS' && state.touch ? lane + 1 : Math.round(v * 100);
-  $('vB').textContent = state.voice === 'DRUMS' ? Math.round(v * 100) : state.voice === 'BASS' ? Math.round((sound.BASS.grit * 0.7 + v * 0.4) * 100) : MODELS[state.voice][sound[state.voice].model];
+  $('vB').textContent = state.voice === 'AUTO' ? DRUM_LABELS[Math.round(v * 7)] : state.voice === 'DRUMS' ? Math.round(v * 100) : state.voice === 'BASS' ? Math.round((sound.BASS.grit * 0.7 + v * 0.4) * 100) : MODELS[state.voice][sound[state.voice].model];
 
   if (state.mode === 'PLAY') drawField(now);
   if (frameCount % 15 === 0) {
+    const vs = $('voxStatus');
+    if (performance.now() < voxBusyUntil) vs.innerHTML = '<span class="live">● SPRICHT</span>'; else vs.textContent = 'BEREIT';
     const st = $('recStatus');
     if (REC.active) { st.innerHTML = `<span class="live">● REC ${fmt(REC.frames / REC.sr)} · SONG ${String(REC.index).padStart(2, '0')}</span>`; }
     else st.textContent = REC.pendingSet ? 'SPEICHERT …' : 'BEREIT';
@@ -1332,6 +1765,14 @@ function drawField(now) {
     c.lineWidth = 2;
     c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.stroke();
   }
+  if (!finger && state.voice === 'AUTO' && state.playing) {
+    const gx = state.home * lw + lw / 2, gy = (1 - state.auto.y) * h;
+    c.strokeStyle = 'rgba(255,79,0,0.55)'; c.lineWidth = 1.5; c.setLineDash([3, 4]);
+    c.beginPath(); c.arc(gx, gy, 16 + pulse * 6, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
+    c.fillStyle = 'rgba(255,79,0,0.6)'; c.beginPath(); c.arc(gx, gy, 5, 0, Math.PI * 2); c.fill();
+    c.font = '500 9px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.fillStyle = '#8e8c87';
+    c.fillText('AUTOPILOT', gx, gy - 26);
+  }
   if (finger) {
     const ln = laneFromX(finger.x), qx = ln * lw + lw / 2;
     c.fillStyle = 'rgba(255,79,0,0.12)'; c.beginPath(); c.arc(qx, finger.y, 34, 0, Math.PI * 2); c.fill();
@@ -1364,6 +1805,125 @@ function drawScope() {
   } else { c.moveTo(0, h / 2); c.lineTo(w, h / 2); }
   c.stroke();
 }
+
+// ---------------------------------------------------------- VOX: computer voice for set start and transitions
+const VOX_MODELS = ['METALL', 'VERZERRT', 'FUNK'];
+const VOX_SUGGEST = [
+  'Willkommen im Maschinenraum', 'System online', 'Field eins aktiviert', 'Nächste Übertragung', 'Neues Signal',
+  'Keep moving', 'Body music', 'Welcome to the machine', 'Berlin. Jetzt.', 'Der Bass übernimmt',
+  'Kein Schlaf bis Montag', 'Access granted', 'Daten werden geladen', 'Wir sind die Maschine',
+];
+const vox = { model: 0, pitch: 0.35, grit: 0.5, metal: 0.6, space: 0.5, intro: true, trans: true, introText: '', transText: '', idx: 0, cache: new Map() };
+try { Object.assign(vox, JSON.parse(localStorage.getItem('field1.vox') || '{}')); } catch (e) { /* storage blocked */ }
+vox.cache = new Map();
+if (vox.introText) $('voxIntro').value = vox.introText;
+if (vox.transText) $('voxTrans').value = vox.transText;
+function saveVox() {
+  vox.introText = $('voxIntro').value; vox.transText = $('voxTrans').value;
+  try { const { cache, ...plain } = vox; localStorage.setItem('field1.vox', JSON.stringify(plain)); } catch (e) { /* storage blocked */ }
+}
+const voxPitchHz = () => 55 + vox.pitch * 110;
+async function voxRender(text) {
+  const key = text + '|' + Math.round(voxPitchHz());
+  if (vox.cache.has(key)) return vox.cache.get(key);
+  if (!window.F1Voice) return null;
+  const buf = await window.F1Voice.render(text, { pitch: voxPitchHz(), speed: 0.95 });
+  if (vox.cache.size > 20) vox.cache.clear();
+  vox.cache.set(key, buf);
+  return buf;
+}
+function applyVox() { if (A) A.voiceModel(vox.model, vox.grit, vox.metal, vox.space); }
+let voxBusyUntil = 0;
+async function voxSay(text, when) {
+  text = (text || '').trim();
+  if (!text) return;
+  ensureAudio();
+  applyVox();
+  A.ac.resume();
+  const buf = await voxRender(text);
+  if (!buf) return;
+  let t = typeof when === 'function' ? when() : when;
+  if (!t || t < A.ac.currentTime + 0.02) t = state.playing ? A.nextBeatTime() : A.ac.currentTime + 0.05;
+  const dur = A.speak(buf, t);
+  voxBusyUntil = performance.now() + (t - A.ac.currentTime + dur) * 1000;
+}
+const transPhrases = () => $('voxTrans').value.split('/').map((x) => x.trim()).filter(Boolean);
+function nextTransPhrase() { const l = transPhrases(); if (!l.length) return ''; const p = l[vox.idx % l.length]; vox.idx++; return p; }
+// pre-render the next transition line during the outro so it lands exactly on the new song
+function prepareTransition() { if (!vox.trans) return; const l = transPhrases(); if (l.length) voxRender(l[vox.idx % l.length]); }
+
+function buildVox() {
+  const chips = $('voxChips');
+  for (const t of VOX_SUGGEST) {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = t.toUpperCase();
+    b.addEventListener('click', () => { $('voxText').value = t; voxSay(t); });
+    chips.appendChild(b);
+  }
+  const models = $('voxModels');
+  VOX_MODELS.forEach((name, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = name;
+    b.addEventListener('click', () => { vox.model = i; saveVox(); renderVox(); voxSay($('voxText').value || 'System online'); });
+    models.appendChild(b);
+  });
+  const KN = [['pitch', 'PITCH', 'Tonhöhe'], ['grit', 'GRIT', 'Verzerrung'], ['metal', 'METAL', 'Ringmod + Kamm'], ['space', 'SPACE', 'Echo + Hall']];
+  for (const [key, label, help] of KN) makeKnob($('voxKnobs'), {
+    label, help, get: () => vox[key], set: (x) => { vox[key] = x; if (key === 'pitch') vox.cache.clear(); saveVox(); applyVox(); },
+    def: { pitch: 0.35, grit: 0.5, metal: 0.6, space: 0.5 }[key],
+  });
+  $('voxSay').addEventListener('click', () => voxSay($('voxText').value));
+  $('voxText').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); voxSay($('voxText').value); } });
+  $('voxIntroOn').addEventListener('click', () => { vox.intro = !vox.intro; saveVox(); renderVox(); });
+  $('voxTransOn').addEventListener('click', () => { vox.trans = !vox.trans; saveVox(); renderVox(); });
+  $('voxIntro').addEventListener('change', saveVox);
+  $('voxTrans').addEventListener('change', () => { saveVox(); vox.cache.clear(); });
+  renderVox();
+}
+function renderVox() {
+  [...$('voxModels').children].forEach((b, i) => b.setAttribute('aria-pressed', String(vox.model === i)));
+  for (const [id, on] of [['voxIntroOn', vox.intro], ['voxTransOn', vox.trans]]) { $(id).setAttribute('aria-pressed', String(on)); $(id).textContent = on ? 'AN' : 'AUS'; }
+  for (const k of voxKnobs) k.render();
+}
+const voxKnobs = [];
+function makeKnob(wrap, o) {
+  const tile = document.createElement('div');
+  tile.className = 'knob'; tile.setAttribute('role', 'slider'); tile.tabIndex = 0;
+  tile.setAttribute('aria-label', o.label); tile.setAttribute('aria-valuemin', '0'); tile.setAttribute('aria-valuemax', '100');
+  const svg = svgEl('svg', { viewBox: '0 0 120 120', 'aria-hidden': 'true' });
+  svg.appendChild(svgEl('circle', { cx: 60, cy: 60, r: 50, fill: 'none', stroke: '#2b2b2b', 'stroke-width': 7, 'stroke-linecap': 'round', 'stroke-dasharray': '235.6 314.2', transform: 'rotate(135 60 60)' }));
+  const arc = svgEl('circle', { cx: 60, cy: 60, r: 50, fill: 'none', stroke: '#f2f0eb', 'stroke-width': 7, 'stroke-linecap': 'round', 'stroke-dasharray': '0 314.2', transform: 'rotate(135 60 60)' });
+  svg.appendChild(arc);
+  svg.appendChild(svgEl('circle', { cx: 60, cy: 60, r: 34, fill: '#222222', stroke: '#0a0a0a', 'stroke-width': 2 }));
+  const g = svgEl('g', {}); g.appendChild(svgEl('line', { x1: 60, y1: 30, x2: 60, y2: 44, stroke: '#f2f0eb', 'stroke-width': 4, 'stroke-linecap': 'round' })); svg.appendChild(g);
+  const n = document.createElement('div'); n.className = 'n'; n.textContent = o.label;
+  const d = document.createElement('div'); d.className = 'd';
+  tile.append(svg, n, d); wrap.appendChild(tile);
+  const k = {
+    render() {
+      const val = o.get();
+      arc.setAttribute('stroke-dasharray', `${(235.6 * val).toFixed(1)} 314.2`);
+      arc.setAttribute('stroke', tile.classList.contains('active') ? ACC : '#f2f0eb');
+      g.setAttribute('transform', `rotate(${(225 + val * 270) % 360} 60 60)`);
+      d.textContent = o.help + ' · ' + Math.round(val * 100);
+      tile.setAttribute('aria-valuenow', String(Math.round(val * 100)));
+    },
+  };
+  let sy = 0, sx = 0, sv0 = 0, lastTap = 0;
+  const setV = (x) => { o.set(clamp(x, 0, 1)); k.render(); };
+  tile.addEventListener('pointerdown', (e) => {
+    tile.setPointerCapture(e.pointerId); sy = e.clientY; sx = e.clientX; sv0 = o.get(); tile.classList.add('active');
+    const now = performance.now(); if (now - lastTap < 300) setV(o.def); lastTap = now; k.render();
+  });
+  tile.addEventListener('pointermove', (e) => { if (tile.hasPointerCapture(e.pointerId)) setV(sv0 + ((sy - e.clientY) + (e.clientX - sx)) / 200); });
+  const up = () => { tile.classList.remove('active'); k.render(); };
+  tile.addEventListener('pointerup', up); tile.addEventListener('pointercancel', up);
+  tile.addEventListener('keydown', (e) => {
+    const dd = e.key === 'ArrowUp' || e.key === 'ArrowRight' ? 0.05 : e.key === 'ArrowDown' || e.key === 'ArrowLeft' ? -0.05 : 0;
+    if (dd) { setV(o.get() + dd); e.preventDefault(); }
+  });
+  voxKnobs.push(k);
+  return k;
+}
+buildVox();
 
 // ---------------------------------------------------------- volume
 const volEl = $('vol');

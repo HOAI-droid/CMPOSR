@@ -10,7 +10,7 @@ import re
 root = Path(__file__).resolve().parent.parent
 html = (root / 'app' / 'index.html').read_text()
 css = (root / 'app' / 'field.css').read_text()
-js = (root / 'app' / 'field.js').read_text()
+js = (root / 'app' / 'voice.js').read_text() + '\n' + (root / 'app' / 'field.js').read_text()
 
 head = re.search(r'<!-- HEAD START -->(.*?)<!-- HEAD END -->', html, re.S).group(1).strip()
 body = re.search(r'<!-- BODY START -->(.*?)<!-- BODY END -->', html, re.S).group(1).strip()
