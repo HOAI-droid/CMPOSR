@@ -5,6 +5,17 @@ Generatives Techno-Instrument zum Spielen mit dem Finger. Ein Song baut sich sel
 in den nächsten Song über. Über das Feld spielst du live darüber. Alle Klänge werden in Echtzeit
 synthetisiert (Web Audio), es gibt keine Samples.
 
+## Was jeden Song anders macht
+
+- **Unterstile:** pro Welt 3–4 (z. B. Hypnotic: Deep, Rolling, Tunnel, Minimal; Industrial: Pounding, EBM, Noise, Schranz)
+- **Groove-Bibliothek:** 20 typische Drum-Grooves (Berghain-Rolling, Tresor-Hardgroove, EBM, Schranz, Dub, Electro, 909 …), dazu Ghost-Notes und wechselnde Fills
+- **Feel:** Swing, Mikro-Timing pro Instrument (Hats vor, Clap hinter dem Schlag), Akzente, Humanisierung, langsame Klang-Drift
+- **Kit pro Song:** Kick, Hats, Clap, Snare, Rimshot, Shaker und Percussion (Tom, Conga, Woodblock, FM) klingen jedes Mal anders
+- **Hook pro Song:** Acid-Line, Dub-Riff, FM-Glocke, Vox-Chop, Sequenz, Metall-Loop oder String-Lead – eingeführt, aufgebaut, im Peak voll da, im zweiten Peak weiterentwickelt
+- **DJ-Momente:** Stille vor dem Drop, Snare-Roll, Kick-Pause, Delay-Wurf, Filterfahrt, Hall-Welle
+- **Set-Dramaturgie:** Warm-up → Aufbau → Peak-Time → Closing (alle 8 Songs), mit passendem Tempo, Unterstil und Songaufbau
+- **Set-Gedächtnis:** zuletzt genutzte Unterstile, Grooves, Hooks und Abläufe werden gemieden
+
 ## Bedienung
 
 | Element | Funktion |

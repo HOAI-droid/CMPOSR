@@ -583,11 +583,11 @@ const DRUM_LABELS = ['MIN', 'HAT', 'OPEN', 'PERC', 'RIDE', 'CLAP', 'METL', 'MAX'
 
 // ============================================================ worlds
 const WORLDS = {
-  HYPNO:  { id: 'W01', name: 'HYPNOTIC', dna: 'RUMBLE-KICK · ROLLENDER SUB · DUB-AKKORDE',   bpm: 132, bpmVar: 3, swing: 0.02, hat: 0.55, ride: 0, perc: [3, 5], percPitch: 1.6, clap: 0.4, metal: 0.15, bass: 'roll',  stab: 0.7,  noise: 0.35, sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
-  GROOVE: { id: 'W02', name: 'HARDGROOVE', dna: 'PERKUSSIVE LOOPS · RIDE · SWING · TOMS', bpm: 144, bpmVar: 3, swing: 0.13, hat: 0.8,  ride: 1, perc: [5, 7], percPitch: 1,   clap: 1,   metal: 0.3,  bass: 'off2',  stab: 0.25, noise: 0.25, sound: { DRUMS: 1, BASS: 0, SYNTH: 0, NOISE: 0 } },
-  INDUS:  { id: 'W03', name: 'INDUSTRIAL', dna: 'CLIPPENDE KICK · METALL · VERZERRTER BASS', bpm: 150, bpmVar: 4, swing: 0,    hat: 0.75, ride: 0, perc: [3, 4], percPitch: 0.8, clap: 1,   metal: 0.85, bass: 'reese', stab: 0.1,  noise: 0.6,  sound: { DRUMS: 2, BASS: 2, SYNTH: 1, NOISE: 1 } },
-  DUB:    { id: 'W04', name: 'DUB', dna: 'DUB-CHORDS · ECHO · TIEFER SUB · SWING',        bpm: 124, bpmVar: 3, swing: 0.2,  hat: 0.35, ride: 0, perc: [3, 3], percPitch: 1.3, clap: 0.3, metal: 0,    bass: 'off',   stab: 1,    noise: 0.35, sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
-  DETROIT: { id: 'W05', name: 'DETROIT', dna: 'GEBROCHENE BEATS · 808 · STRINGS · ELECTRO', bpm: 130, bpmVar: 4, swing: 0.06, hat: 0.75, ride: 0, perc: [4, 6], percPitch: 1.2, clap: 1, metal: 0.1, bass: 'electro', stab: 0.85, noise: 0.2, kick: 'broken', sound: { DRUMS: 1, BASS: 0, SYNTH: 2, NOISE: 1 } },
+  HYPNO:  { id: 'W01', name: 'HYPNOTIC', dna: 'RUMBLE-KICK · ROLLENDER SUB · DUB-AKKORDE',   bpm: 132, swing: 0.02, percPitch: 1.6, clap: 0.35, metal: 0.15, stab: 0.7,  noise: 0.35, perc: ['tom', 'conga', 'fm', 'wood'], sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
+  GROOVE: { id: 'W02', name: 'HARDGROOVE', dna: 'PERKUSSIVE LOOPS · RIDE · SWING · TOMS', bpm: 144, swing: 0.12, percPitch: 1, clap: 1, metal: 0.3,  stab: 0.25, noise: 0.25, perc: ['tom', 'conga', 'tom', 'wood'], sound: { DRUMS: 1, BASS: 0, SYNTH: 0, NOISE: 0 } },
+  INDUS:  { id: 'W03', name: 'INDUSTRIAL', dna: 'CLIPPENDE KICK · METALL · VERZERRTER BASS', bpm: 148, swing: 0, percPitch: 0.8, clap: 1, metal: 0.85, stab: 0.1,  noise: 0.6, perc: ['fm', 'tom', 'fm'], sound: { DRUMS: 2, BASS: 2, SYNTH: 1, NOISE: 1 } },
+  DUB:    { id: 'W04', name: 'DUB', dna: 'DUB-CHORDS · ECHO · TIEFER SUB · SWING', bpm: 124, swing: 0.18, percPitch: 1.3, clap: 0.3, metal: 0, stab: 1, noise: 0.35, perc: ['conga', 'wood', 'fm'], sound: { DRUMS: 0, BASS: 0, SYNTH: 1, NOISE: 2 } },
+  DETROIT: { id: 'W05', name: 'DETROIT', dna: 'GEBROCHENE BEATS · 808 · STRINGS · ELECTRO', bpm: 130, swing: 0.06, percPitch: 1.2, clap: 1, metal: 0.1, stab: 0.85, noise: 0.2, perc: ['conga', 'tom', 'fm'], sound: { DRUMS: 1, BASS: 0, SYNTH: 2, NOISE: 1 } },
 };
 const WORLD_KEYS = Object.keys(WORLDS);
 
@@ -610,7 +610,86 @@ const DEFAULT_SOUND = {
 const sound = JSON.parse(JSON.stringify(DEFAULT_SOUND));
 const locked = { DRUMS: false, BASS: false, SYNTH: false, NOISE: false };
 
-// ============================================================ pattern generator
+// ============================================================ groove library
+// One bar per layer: '.' rest · '1'..'9' velocity (always plays) · 'a'..'i' velocity with 50 % chance · 'x' full
+const GROOVES = {
+  hyp_rolling: { kick: '9...9...9...9...', hat: '2a5a2a5a2a5a2a5a', open: '..7...7...7...7.', perc: '....c.....c..c..', rim: '...........4....' },
+  hyp_deep:    { kick: '9...9...9...9...', hat: '..4...4...4...4.', shaker: 'a2a3a2a3a2a3a2a3', rim: '.......3.......c', clap: '............5...', perc: '..........b.....' },
+  hyp_tunnel:  { kick: '9...9...9...9...', hat: '1414141414141414', ride: '..6...6...6...6.', perc: '..3..3....3..3..', open: '..........6.....' },
+  hyp_minimal: { kick: '9...9...9...9...', hat: '....3.......3..a', perc: 'c..c..c..c..c...', rim: '..3.....3.......', shaker: '.2.2.2.2.2.2.2.2' },
+  hyp_dub:     { kick: '9...9...9...9...', hat: '.a3a.a3a.a3a.a3a', open: '..6.......6.....', rim: '...3......3.....', clap: '............4...' },
+  hg_loop:     { kick: '9...9...9...9...', hat: '2626262626262626', open: '..7...7...7...7.', ride: '6.4.6.4.6.4.6.4.', perc: '7..5..6...7..5..', rim: '....5.......5..4', clap: '....8.......8...', shaker: '4242424242424242' },
+  hg_tribal:   { kick: '9...9...9...9...', hat: '..5...5...5...5.', perc: '7.57..6.7.5..6.4', rim: '.4..4..4.4..4...', clap: '....8.......8...', shaker: '3a3a3a3a3a3a3a3a' },
+  hg_jack:     { kick: '9...9...9...9..6', hat: '5353535353535353', open: '..8...8...8...8.', clap: '....9.......9...', snare: '..........b....b', ride: '8.8.8.8.8.8.8.8.' },
+  hg_shuffle:  { kick: '9...9...9...9...', hat: '3.53.53.53.53.5.', perc: '..6..6..6..6..6.', clap: '....8.......8...', ride: '..7...7...7...7.', rim: '.........4..4...' },
+  ind_pound:   { kick: '9...9...9...9..6', hat: '.4.4.4.4.4.4.4.4', open: '..8...8...8...8.', metal: '...7..7....7..7.', clap: '....9.......9...', snare: '....9.......9...' },
+  ind_ebm:     { kick: '9...9.5.9...9.5.', hat: '5555555555555555', metal: '..6.....6.....6.', snare: '....9.......9...', perc: '.......5.......5' },
+  ind_gallop:  { kick: '9..79...9..79...', hat: '.3.3.3.3.3.3.3.3', metal: 'b.b.b.b.b.b.b.b.', clap: '....9.......9...', open: '..7.......7.....' },
+  ind_schranz: { kick: '9...9...9...9...', hat: '6666666666666666', open: '..9...9...9...9.', perc: '7.7.7.7.7.7.7.7.', metal: '...8...8...8...8', clap: '....9.......9...' },
+  dub_classic: { kick: '9...9...9...9...', hat: '..4...4...4...4.', shaker: 'a2a2a2a2a2a2a2a2', rim: '...3......3.....', clap: '............4...' },
+  dub_skippy:  { kick: '9...9...9...9...', hat: '.3.3.3.3.3.3.3.3', perc: '......4.....4...', rim: '..3.....3.......', open: '..........5.....' },
+  dub_steppa:  { kick: '9...9...9...9...', hat: '3a3a3a3a3a3a3a3a', open: '..6...6...6...6.', rim: '....4.......4...', perc: '.......c.......c' },
+  det_electro: { kick: '9.....9...9.....', hat: '3535353535353535', clap: '....9.......9...', perc: '..5.......5.5...' },
+  det_broken:  { kick: '9......69.9.....', hat: '..5...5...5...5.', shaker: '3333333333333333', clap: '....9.......9...', perc: '...4..4.....4...' },
+  det_909:     { kick: '9...9...9...9...', hat: '2626262626262626', open: '..8...8...8...8.', clap: '....9.......9...', ride: '8.6.8.6.8.6.8.6.', rim: '..4..4..4..4..4.' },
+  det_funk:    { kick: '9.....9.9.......', snare: '....9.......9...', hat: '5.5.5.5.5.5.5.5.', perc: '...........6.6..', open: '......7.........' },
+};
+// sub-styles: which grooves, bass figures and hooks belong together, and how much energy they carry
+const SUBS = {
+  HYPNO: [
+    { id: 'DEEP', grooves: ['hyp_deep', 'hyp_dub'], bass: ['long', 'roll', 'off'], hooks: ['vox', 'stabriff', 'bell'], energy: 0.3, bpm: -2 },
+    { id: 'ROLLING', grooves: ['hyp_rolling', 'hyp_tunnel'], bass: ['roll', 'roll2'], hooks: ['bell', 'seq', 'vox'], energy: 0.65, bpm: 0 },
+    { id: 'TUNNEL', grooves: ['hyp_tunnel', 'hyp_minimal', 'hyp_rolling'], bass: ['roll', 'sync'], hooks: ['bell', 'noiseloop', 'seq'], energy: 0.55, bpm: 1 },
+    { id: 'MINIMAL', grooves: ['hyp_minimal', 'hyp_deep'], bass: ['off', 'sync'], hooks: ['seq', 'vox', 'bell'], energy: 0.35, bpm: -1 },
+  ],
+  GROOVE: [
+    { id: 'LOOP', grooves: ['hg_loop', 'hg_shuffle'], bass: ['off2', 'off'], hooks: ['vox', 'noiseloop'], energy: 0.7, bpm: 0 },
+    { id: 'TRIBAL', grooves: ['hg_tribal', 'hg_loop'], bass: ['off', 'sync'], hooks: ['bell', 'vox'], energy: 0.6, bpm: -1 },
+    { id: 'JACKING', grooves: ['hg_jack', 'hg_shuffle'], bass: ['off2', 'gallop'], hooks: ['acid', 'vox'], energy: 0.85, bpm: 2 },
+    { id: 'SHUFFLE', grooves: ['hg_shuffle', 'hg_tribal'], bass: ['sync', 'off'], hooks: ['stabriff', 'bell'], energy: 0.5, bpm: -2 },
+  ],
+  INDUS: [
+    { id: 'POUNDING', grooves: ['ind_pound', 'ind_schranz'], bass: ['reese', 'off2'], hooks: ['noiseloop', 'vox'], energy: 0.85, bpm: 1 },
+    { id: 'EBM', grooves: ['ind_ebm', 'ind_gallop'], bass: ['gallop', 'eighth'], hooks: ['acid', 'lead'], energy: 0.7, bpm: -4 },
+    { id: 'NOISE', grooves: ['ind_gallop', 'ind_pound'], bass: ['reese', 'long'], hooks: ['noiseloop', 'vox'], energy: 0.6, bpm: -2 },
+    { id: 'SCHRANZ', grooves: ['ind_schranz', 'ind_pound'], bass: ['off2', 'reese'], hooks: ['noiseloop', 'acid'], energy: 0.95, bpm: 4 },
+  ],
+  DUB: [
+    { id: 'CHORD', grooves: ['dub_classic', 'dub_skippy'], bass: ['long', 'off'], hooks: ['stabriff', 'vox'], energy: 0.35, bpm: 0 },
+    { id: 'STEPPER', grooves: ['dub_steppa', 'dub_classic'], bass: ['off', 'roll'], hooks: ['stabriff', 'bell'], energy: 0.55, bpm: 1 },
+    { id: 'SKIPPY', grooves: ['dub_skippy', 'dub_steppa'], bass: ['sync', 'off'], hooks: ['stabriff', 'seq'], energy: 0.45, bpm: -1 },
+  ],
+  DETROIT: [
+    { id: 'ELECTRO', grooves: ['det_electro', 'det_funk'], bass: ['electro'], hooks: ['seq', 'lead', 'acid'], energy: 0.6, bpm: 0 },
+    { id: 'BROKEN', grooves: ['det_broken', 'det_electro'], bass: ['electro', 'sync'], hooks: ['lead', 'stabriff'], energy: 0.5, bpm: -2 },
+    { id: '909-SOUL', grooves: ['det_909'], bass: ['off2', 'sync'], hooks: ['stabriff', 'lead', 'seq'], energy: 0.7, bpm: 2 },
+    { id: 'FUNK', grooves: ['det_funk', 'det_broken'], bass: ['electro', 'gallop'], hooks: ['acid', 'seq'], energy: 0.55, bpm: 0 },
+  ],
+};
+const BASS_STYLES = {
+  roll: '.799.799.799.799', roll2: '.979.979.979.979', off: '..9...9...9...9.', off2: '..97..97..97..97',
+  sync: '..9..9.9..9..9.7', gallop: '..9.97..9..97.9.', reese: '..9...97..9...97', long: '9.......9.......', eighth: '.9.9.9.9.9.9.9.9',
+};
+const BASS_DUR = { long: 7.5, reese: 1.2 };
+const HOOK_LABEL = { acid: 'ACID-LINE', stabriff: 'DUB-RIFF', bell: 'FM-GLOCKE', vox: 'VOX-CHOP', seq: 'SEQUENZ', noiseloop: 'METALL-LOOP', lead: 'STRING-LEAD' };
+const ACCENTS = [[1, 0.65, 0.85, 0.65], [0.7, 0.75, 1, 0.75], [1, 0.6, 0.6, 1, 0.6, 0.6, 1, 0.6], [0.8, 0.6, 1, 0.6, 0.8, 0.6, 1, 0.9], [1, 0.75]];
+const FILLS = ['none', 'kickdrop', 'tomfill', 'openhat', 'clapflam', 'snareroll', 'percbreak'];
+
+// set dramaturgy: warm-up → build → peak time → closing, repeating every 8 songs
+const PHASES = [
+  { name: 'WARM-UP', energy: 0.3, bpm: -4 },
+  { name: 'AUFBAU', energy: 0.55, bpm: -1 },
+  { name: 'PEAK-TIME', energy: 0.85, bpm: 3 },
+  { name: 'CLOSING', energy: 0.4, bpm: -2 },
+];
+const SET_CURVE = [0, 0, 1, 2, 2, 2, 2, 3];
+// set memory: what was played recently is avoided
+const setMem = { subs: [], grooves: [], hooks: [], bass: [], plans: [], fills: [] };
+const MEM_LEN = { subs: 2, grooves: 2, hooks: 3, bass: 2, plans: 2, fills: 3 };
+const remember = (k, v) => { setMem[k].push(v); if (setMem[k].length > MEM_LEN[k]) setMem[k].shift(); };
+const fresh = (list, k) => { const f = list.filter((x) => !setMem[k].includes(x)); return f.length ? f : list; };
+const rnd = (a, b) => a + R() * (b - a);
+
 function euclid(k, n, rot = 0) {
   const out = [];
   for (let i = 0; i < n; i++) out.push(((i * k) % n) < k);
@@ -618,92 +697,185 @@ function euclid(k, n, rot = 0) {
   return out.slice(n - r).concat(out.slice(0, n - r));
 }
 const zeros = () => new Array(LOOP).fill(0);
-const LAYERS = ['kick', 'hat', 'open', 'perc', 'ride', 'clap', 'metal', 'bass', 'stab', 'noise'];
+const LAYERS = ['kick', 'hat', 'open', 'perc', 'ride', 'clap', 'metal', 'bass', 'stab', 'noise', 'rim', 'shaker', 'snare'];
+
+function stamp(P, V, layer, str, b) {
+  for (let i = 0; i < 16; i++) {
+    const x = b * 16 + i;
+    const ch = str ? str[i] : '.';
+    P[layer][x] = 0; V[layer][x] = 0;
+    if (!ch || ch === '.') continue;
+    if (ch === 'x') { P[layer][x] = 1; V[layer][x] = 1; continue; }
+    const c = ch.charCodeAt(0);
+    if (c >= 49 && c <= 57) { P[layer][x] = 1; V[layer][x] = (c - 48) / 9; }
+    else if (c >= 97 && c <= 105) { P[layer][x] = 0.5; V[layer][x] = (c - 96) / 9; }
+  }
+}
+
+function genHook(type) {
+  const steps = [];
+  let len = 16;
+  if (type === 'acid') {
+    const pool = [0, 0, 0, 7, 3, 5, -2, 2, 4, 10, 7];
+    for (let i = 0; i < 16; i++) steps[i] = R() < 0.68 ? { deg: pick(pool), acc: R() < 0.3, slide: R() < 0.22 } : null;
+  } else if (type === 'stabriff') {
+    len = 32;
+    const pos = pick([[3, 6, 10, 14, 19, 22, 26], [2, 10, 14, 18, 26, 30], [3, 11, 19, 27], [0, 6, 12, 16, 22, 28]]);
+    const degs = pick([[0, 0, 0, -2], [0, 0, -2, -3], [0, 3, 0, -2], [0, -3, -2, 0]]);
+    for (const p of pos) steps[p] = { deg: degs[Math.floor(p / 8) % 4], acc: R() < 0.4, dur: pick([1, 2, 3]) };
+  } else if (type === 'bell') {
+    const e = euclid(5 + Math.floor(R() * 3), 16, Math.floor(R() * 4));
+    const ch = pick([[0, 2, 4, 7, 9, 4], [0, 4, 7, 11, 7], [0, 3, 7, 2, 9]]);
+    let j = 0;
+    e.forEach((on, i) => { if (on) steps[i] = { deg: ch[j++ % ch.length] + (R() < 0.2 ? 7 : 0), acc: i % 4 === 0 }; });
+  } else if (type === 'vox') {
+    len = 32;
+    const e = euclid(3 + Math.floor(R() * 3), 32, Math.floor(R() * 8));
+    const vw = pick([['a', 'o'], ['e', 'a'], ['o', 'u'], ['a', 'e', 'o']]);
+    let j = 0;
+    e.forEach((on, i) => { if (on) steps[i] = { deg: pick([0, 0, 2, -2, 4]), vowel: vw[j++ % vw.length], acc: R() < 0.5, dur: pick([1, 2]) }; });
+  } else if (type === 'seq') {
+    const shape = pick([[0, 2, 4, 7], [0, 4, 2, 7, 4, 9], [7, 4, 2, 0], [0, 7, 3, 10], [0, 0, 7, 0, 3, 0]]);
+    const rate = pick([1, 2, 2]);
+    for (let i = 0; i < 16; i += rate) steps[i] = R() < 0.85 ? { deg: shape[(i / rate) % shape.length], acc: i % 4 === 0 } : null;
+  } else if (type === 'noiseloop') {
+    const e = euclid(pick([5, 7, 9]), 16, Math.floor(R() * 5));
+    e.forEach((on, i) => { if (on) steps[i] = { deg: pick([0, 2, 4, 7]), acc: i % 4 === 0 }; });
+  } else if (type === 'lead') {
+    len = 32;
+    const mel = pick([[0, 2, 3, -2], [4, 3, 2, 0], [0, -2, -3, -2], [7, 4, 3, 2]]);
+    const pos = pick([[0, 8, 12, 16, 24], [0, 6, 16, 22], [0, 12, 16, 28]]);
+    pos.forEach((p, i) => { steps[p] = { deg: mel[i % mel.length], dur: (pos[i + 1] ?? 32) - p, acc: true }; });
+  }
+  return { type, len, steps, label: HOOK_LABEL[type] };
+}
+// the hook of the second peak: same idea, developed
+function developHook(h) {
+  const d = JSON.parse(JSON.stringify(h));
+  const idx = d.steps.map((s, i) => (s ? i : -1)).filter((i) => i >= 0);
+  for (let n = 0; n < Math.max(1, Math.round(idx.length * 0.3)); n++) {
+    const i = pick(idx);
+    if (d.steps[i]) d.steps[i].deg += pick([7, 2, -2, 3]);
+  }
+  if (d.type === 'acid' || d.type === 'seq') for (let i = 0; i < d.len; i++) if (!d.steps[i] && R() < 0.15) d.steps[i] = { deg: pick([0, 7, 3]), acc: R() < 0.4 };
+  return d;
+}
 
 function genSong(wk, prev) {
   const w = WORLDS[wk];
   const s = { world: wk, num: prev ? prev.num + 1 : 1 };
-  s.bpm = Math.round(w.bpm + (R() * 2 - 1) * w.bpmVar);
-  if (prev && prev.world === wk && s.bpm === prev.bpm) s.bpm += pick([-2, 2]);
+  s.phase = SET_CURVE[(s.num - 1) % SET_CURVE.length];
+  const ph = PHASES[s.phase];
+  s.phaseName = ph.name;
+  s.energy = ph.energy;
+
+  // sub-style: closest to the set energy, not used recently
+  const subs = SUBS[wk];
+  const cand = fresh(subs.map((x) => x.id), 'subs').map((id) => subs.find((x) => x.id === id));
+  cand.sort((a, b) => (Math.abs(a.energy - ph.energy) + R() * 0.35) - (Math.abs(b.energy - ph.energy) + R() * 0.35));
+  const sub = cand[0];
+  s.sub = sub.id; remember('subs', sub.id);
+
+  s.bpm = Math.round(w.bpm + sub.bpm + ph.bpm + rnd(-1.5, 1.5));
+  if (prev && prev.world === wk && s.bpm === prev.bpm) s.bpm += pick([-1, 1]);
   const moves = [2, -2, 3, -3, 5, -4];
   s.root = 0;
   if (prev) { for (let i = 0; i < 6 && (s.root === 0 || s.root === prev.root); i++) s.root = clamp(prev.root + pick(moves), -4, 5); }
-  s.swing = Math.max(0, w.swing + (R() - 0.5) * 0.05);
 
-  const P = {}; for (const l of LAYERS) P[l] = zeros();
+  // feel: swing, micro-timing, accents, humanisation
+  s.feel = {
+    swing: clamp(w.swing + rnd(-0.03, 0.06), 0, 0.3),
+    hatPush: rnd(-0.003, 0.005), openLag: rnd(0, 0.006), clapLag: rnd(0.002, 0.012), percJit: rnd(0.002, 0.006),
+    human: rnd(0.06, 0.18), accent: pick(ACCENTS),
+  };
+  s.lfo = { hat: [rnd(25, 80), rnd(0, 6.3)], tone: [rnd(40, 110), rnd(0, 6.3)], perc: [rnd(20, 60), rnd(0, 6.3)] };
+  // per-song kit: every song gets its own drum sound
+  s.kit = {
+    kickTune: rnd(-3.5, 3.5), kickDecay: rnd(0.82, 1.25), kickPunch: rnd(0.75, 1.3), click: rnd(0.5, 1.4),
+    hatTone: rnd(0.78, 1.25), hatDecay: rnd(0.7, 1.5), clapTone: rnd(850, 1850), clapSpread: rnd(0.007, 0.016),
+    percType: pick(w.perc), snareTone: rnd(170, 260), rimTone: rnd(1300, 2600), delayDiv: pick([0.75, 0.75, 0.5, 1, 0.375]),
+    bellRatio: pick([3.5, 2.76, 1.41, 4.0]), acidWave: pick(['sawtooth', 'square']),
+  };
+
+  const P = {}, V = {};
+  for (const l of LAYERS) { P[l] = zeros(); V[l] = zeros(); }
   P.percN = zeros(); P.notes = zeros();
 
-  for (let b = 0; b < 4; b++) for (let i = 0; i < 16; i++) {
-    const x = b * 16 + i;
-    if (i % 4 === 0) P.kick[x] = 1;
-    if (i % 4 === 2) P.open[x] = 1;
-    P.hat[x] = i % 2 === 1 ? w.hat : i % 4 === 0 ? w.hat * 0.5 : (w.hat > 0.7 ? w.hat * 0.7 : 0);
-    if (w.ride && i % 2 === 0) P.ride[x] = i % 4 === 2 ? 1 : 0.8;
-  }
-  if (w.kick === 'broken') {
-    const KP = [[0, 6, 10], [0, 7, 10], [0, 3, 10, 12], [0, 6, 9, 14]];
-    const ka = pick(KP), kb = pick(KP);
-    for (let b = 0; b < 4; b++) for (let i = 0; i < 16; i++) P.kick[b * 16 + i] = (b === 3 ? kb : ka).includes(i) ? 1 : 0;
-  } else {
-    if (wk === 'INDUS' || R() < 0.4) P.kick[63] = 0.5;
-    if (R() < 0.3) P.kick[46] = 0.4;
-  }
-
-  const k = w.perc[0] + Math.floor(R() * (w.perc[1] - w.perc[0] + 1));
-  const ea = euclid(k, 16, Math.floor(R() * 4));
-  const eb = euclid(Math.min(k + 2, 9), 16, Math.floor(R() * 6));
-  const tomSet = pick([[0, 2, 4], [0, 3, 1], [4, 2, 0, 1], [1, 1, 3]]);
-  for (let b = 0; b < 4; b++) {
-    const e = b === 3 ? eb : ea;
-    for (let i = 0; i < 16; i++) if (e[i]) { P.perc[b * 16 + i] = 0.9; P.percN[b * 16 + i] = tomSet[(i + b) % tomSet.length]; }
-  }
-  if (R() < w.clap) for (let b = 0; b < 4; b++) { P.clap[b * 16 + 4] = 1; P.clap[b * 16 + 12] = 1; }
-  else for (let b = 0; b < 4; b++) P.clap[b * 16 + 12] = 0.6;
-  if (w.metal > 0) {
+  // drums from the groove library: bar A three times (2nd with ghosts), bar 4 with a fill
+  const gid = pick(fresh(sub.grooves, 'grooves'));
+  remember('grooves', gid);
+  s.groove = gid;
+  const G = GROOVES[gid];
+  for (let b = 0; b < 4; b++) for (const l of ['kick', 'hat', 'open', 'perc', 'ride', 'clap', 'metal', 'rim', 'shaker', 'snare']) stamp(P, V, l, G[l], b);
+  for (let n = 0; n < 2; n++) { const l = pick(['hat', 'perc', 'shaker', 'rim']); const x = 16 + Math.floor(R() * 16); if (!P[l][x]) { P[l][x] = 0.5; V[l][x] = 0.35; } }
+  if (!G.metal && w.metal > 0.2) {
     const em = euclid(pick([2, 3, 5]), 16, pick([1, 3, 6]));
-    for (let b = 0; b < 4; b++) for (let i = 0; i < 16; i++) if (em[i]) P.metal[b * 16 + i] = w.metal * (b % 2 ? 0.7 : 1);
+    for (let b = 0; b < 4; b++) for (let i = 0; i < 16; i++) if (em[i]) { P.metal[b * 16 + i] = w.metal * (b % 2 ? 0.7 : 1); V.metal[b * 16 + i] = 0.8; }
   }
-  // bass rhythm + a 4-bar progression
-  const style = w.bass;
-  s.electro = pick([[0, 3, 6, 10, 14], [0, 6, 8, 11, 14], [2, 3, 7, 10, 11, 14]]);
-  const prog = pick([[0, 0, 0, 0], [0, 0, 0, -2], [0, 0, 3, 0], [0, 0, 0, 4], [0, -2, 0, 3], [0, 0, 5, 4], [0, 0, -3, -2]]);
-  for (let b = 0; b < 4; b++) for (let i = 0; i < 16; i++) {
-    const x = b * 16 + i, q = i % 4;
-    let v = 0;
-    if (style === 'roll') v = q !== 0 ? 1 : 0;
-    else if (style === 'off') v = q === 2 ? 1 : 0;
-    else if (style === 'off2') v = q === 2 || q === 3 ? 1 : 0;
-    else if (style === 'reese') v = q === 2 ? 1 : (i % 8 === 7 ? 0.5 : 0);
-    else if (style === 'electro') v = s.electro.includes(i) ? 1 : 0;
-    P.bass[x] = v;
-    P.notes[x] = prog[b] + (q !== 2 && R() < 0.12 ? pick([7, 2, -3, 4]) : 0);
-  }
-  // synth stabs
-  const pos = pick([[3, 10], [6, 14], [3, 6, 13], [7], [10], [2, 7, 10]]);
-  for (let b = 0; b < 4; b++) for (const p of pos) P.stab[b * 16 + ((p + (b === 3 ? 1 : 0)) % 16)] = w.stab * (b === 3 ? 0.6 : 1);
-  // noise accents
+  if (!G.clap && !G.snare && R() < w.clap) for (let b = 0; b < 4; b++) { P.clap[b * 16 + 12] = 1; V.clap[b * 16 + 12] = 0.8; if (R() < 0.6) { P.clap[b * 16 + 4] = 1; V.clap[b * 16 + 4] = 0.75; } }
+  if (R() < 0.35) for (let i = 16; i < 32; i++) { P.perc[i] = P.perc[16 + ((i - 15) % 16)]; V.perc[i] = V.perc[16 + ((i - 15) % 16)]; }
+  const tomSet = pick([[0, 2, 4], [0, 3, 1], [4, 2, 0, 1], [1, 1, 3], [2, 0, 3, 1]]);
+  for (let x = 0; x < LOOP; x++) if (P.perc[x]) P.percN[x] = tomSet[x % tomSet.length];
+  const fill = pick(fresh(FILLS, 'fills'));
+  remember('fills', fill);
+  s.fill = fill;
+  const F0 = 48;
+  if (fill === 'kickdrop') { for (let x = 60; x < 64; x++) { P.kick[x] = 0; P.snare[x] = 1; V.snare[x] = 0.3 + (x - 60) * 0.17; } }
+  else if (fill === 'tomfill') { for (let x = 56; x < 64; x += 2) { P.perc[x] = 1; V.perc[x] = 0.8; P.percN[x] = 4 - (x - 56) / 2; } }
+  else if (fill === 'openhat') { P.open[62] = 1; V.open[62] = 0.9; P.hat[62] = 0; }
+  else if (fill === 'clapflam') { P.clap[59] = 1; V.clap[59] = 0.5; P.clap[63] = 1; V.clap[63] = 0.7; }
+  else if (fill === 'snareroll') { for (let x = 56; x < 64; x++) { P.snare[x] = x < 60 ? 0.5 : 1; V.snare[x] = 0.25 + (x - 56) * 0.08; } }
+  else if (fill === 'percbreak') { for (let x = 56; x < 60; x++) { P.hat[x] = 0; P.perc[x] = 0; P.shaker[x] = 0; P.rim[x] = 0; } }
+  void F0;
+
+  // bass figure + 4-bar progression
+  const bstyle = pick(fresh(sub.bass, 'bass'));
+  remember('bass', bstyle);
+  s.bassStyle = bstyle;
+  s.bassDur = BASS_DUR[bstyle] || 1;
+  const electro = pick([[0, 3, 6, 10, 14], [0, 6, 8, 11, 14], [2, 3, 7, 10, 11, 14]]);
+  const prog = pick([[0, 0, 0, 0], [0, 0, 0, -2], [0, 0, 3, 0], [0, 0, 0, 4], [0, -2, 0, 3], [0, 0, 5, 4], [0, 0, -3, -2], [0, 3, 0, -2]]);
   for (let b = 0; b < 4; b++) {
-    if (R() < 0.7) P.noise[b * 16 + pick([7, 11, 15])] = w.noise;
-    if (R() < w.noise) P.noise[b * 16 + pick([3, 9, 13])] = w.noise * 0.6;
+    if (bstyle === 'electro') { for (let i = 0; i < 16; i++) { P.bass[b * 16 + i] = electro.includes(i) ? 1 : 0; V.bass[b * 16 + i] = 0.9; } }
+    else stamp(P, V, 'bass', BASS_STYLES[bstyle], b);
+    for (let i = 0; i < 16; i++) P.notes[b * 16 + i] = prog[b] + (i % 4 !== 2 && R() < 0.12 ? pick([7, 2, -3, 4]) : 0);
   }
+  // generic synth stabs (the SYNTH voice) and noise accents
+  const pos = pick([[3, 10], [6, 14], [3, 6, 13], [7], [10], [2, 7, 10]]);
+  for (let b = 0; b < 4; b++) for (const p of pos) { const x = b * 16 + ((p + (b === 3 ? 1 : 0)) % 16); P.stab[x] = w.stab * (b === 3 ? 0.6 : 1); V.stab[x] = 1; }
+  for (let b = 0; b < 4; b++) {
+    if (R() < 0.7) { const x = b * 16 + pick([7, 11, 15]); P.noise[x] = w.noise; V.noise[x] = 1; }
+    if (R() < w.noise) { const x = b * 16 + pick([3, 9, 13]); P.noise[x] = w.noise * 0.6; V.noise[x] = 1; }
+  }
+  P.V = V;
   s.P = P;
   s.live = JSON.parse(JSON.stringify(P));
-  // sound models that suit the world (used where the player has not set a voice by hand)
+
+  // the hook: one recognisable idea per song, developed in the second peak
+  const htype = pick(fresh(sub.hooks, 'hooks'));
+  remember('hooks', htype);
+  s.hook = genHook(htype);
+  s.hook2 = developHook(s.hook);
+
+  // sound models and knobs that suit world, sub-style and set phase
   s.sound = { ...w.sound };
   if (wk === 'GROOVE' && R() < 0.35) s.sound.BASS = 1;
   if (wk === 'HYPNO' && R() < 0.25) s.sound.SYNTH = 2;
   if (wk === 'INDUS' && R() < 0.3) s.sound.NOISE = 0;
-  if (R() < 0.15) s.sound.BASS = 1;
+  if (sub.id === 'EBM' || sub.id === 'FUNK') s.sound.BASS = pick([0, 1]);
+  if (R() < 0.12) s.sound.BASS = 1;
+  if (R() < 0.2) s.sound.DRUMS = pick([0, 1, 2].filter((m) => m !== w.sound.DRUMS || wk === 'INDUS'));
+  const e = ph.energy;
   s.knobs = {
     DRUMS: {
-      weight: wk === 'DETROIT' ? 0.8 + R() * 0.2 : 0.4 + R() * 0.3,
-      grit: wk === 'INDUS' ? 0.65 + R() * 0.3 : wk === 'DETROIT' ? 0.1 + R() * 0.15 : 0.2 + R() * 0.3,
-      motion: wk === 'GROOVE' ? 0.5 + R() * 0.3 : 0.25 + R() * 0.3,
-      space: wk === 'HYPNO' ? 0.6 + R() * 0.3 : wk === 'DETROIT' ? 0.1 + R() * 0.15 : 0.25 + R() * 0.3,
+      weight: wk === 'DETROIT' ? rnd(0.8, 1) : rnd(0.35, 0.75),
+      grit: clamp((wk === 'INDUS' ? rnd(0.6, 0.95) : wk === 'DETROIT' ? rnd(0.1, 0.25) : rnd(0.15, 0.5)) + e * 0.12, 0, 1),
+      motion: wk === 'GROOVE' ? rnd(0.5, 0.85) : rnd(0.2, 0.6),
+      space: wk === 'HYPNO' ? rnd(0.55, 0.9) : wk === 'DETROIT' ? rnd(0.1, 0.25) : rnd(0.2, 0.6),
     },
-    BASS: { weight: 0.5 + R() * 0.3, grit: wk === 'INDUS' ? 0.6 + R() * 0.3 : 0.25 + R() * 0.3, motion: 0.35 + R() * 0.35, space: 0.1 + R() * 0.15 },
-    SYNTH: { weight: 0.3 + R() * 0.5, grit: R() * 0.3, motion: 0.3 + R() * 0.4, space: 0.5 + R() * 0.3 },
-    NOISE: { weight: 0.3 + R() * 0.4, grit: wk === 'INDUS' ? 0.6 : 0.3 + R() * 0.3, motion: 0.4 + R() * 0.3, space: 0.4 + R() * 0.4 },
+    BASS: { weight: rnd(0.45, 0.85), grit: clamp((wk === 'INDUS' ? rnd(0.6, 0.9) : rnd(0.2, 0.6)) + e * 0.1, 0, 1), motion: rnd(0.3, 0.75), space: rnd(0.05, 0.3) },
+    SYNTH: { weight: rnd(0.25, 0.85), grit: rnd(0, 0.4), motion: rnd(0.25, 0.75), space: rnd(0.45, 0.85) },
+    NOISE: { weight: rnd(0.25, 0.75), grit: wk === 'INDUS' ? rnd(0.5, 0.8) : rnd(0.2, 0.6), motion: rnd(0.35, 0.75), space: rnd(0.35, 0.85) },
   };
   return s;
 }
@@ -719,14 +891,15 @@ function applySongSound(song, voices = VOICES) {
 
 // small musical mutations once per loop; every 16 bars half of it falls back to the original
 function mutate(song, amount) {
-  const L = song.live, P = song.P;
+  const L = song.live;
   const flips = Math.round(amount * 5);
   for (let i = 0; i < flips; i++) {
-    const layer = pick(['hat', 'perc', 'metal', 'bass', 'stab', 'noise', 'open']);
+    const layer = pick(['hat', 'perc', 'metal', 'bass', 'stab', 'noise', 'open', 'rim', 'shaker']);
     const x = Math.floor(R() * LOOP);
     if (layer === 'bass' && x % 4 === 0) continue;
     if (layer === 'open' && x % 4 !== 2) continue;
-    L[layer][x] = L[layer][x] > 0 ? 0 : pick([1, 0.6, 0.8]);
+    if (L[layer][x] > 0) L[layer][x] = 0;
+    else { L[layer][x] = pick([1, 0.6, 0.8]); L.V[layer][x] = L.V[layer][x] || pick([0.5, 0.7, 0.9]); }
     if (layer === 'perc') L.percN[x] = Math.floor(R() * 5);
   }
   if (R() < amount * 0.7) {
@@ -735,32 +908,72 @@ function mutate(song, amount) {
   }
 }
 function relax(song) {
-  for (const l of [...LAYERS, 'notes', 'percN']) for (let x = 0; x < LOOP; x++) if (R() < 0.5) song.live[l][x] = song.P[l][x];
+  for (const l of [...LAYERS, 'notes', 'percN']) for (let x = 0; x < LOOP; x++) if (R() < 0.5) {
+    song.live[l][x] = song.P[l][x];
+    if (song.P.V[l]) song.live.V[l][x] = song.P.V[l][x];
+  }
 }
 
 // ============================================================ arrangement
-function makePlan() {
-  const T = pick([1, 2, 2, 3, 3]);
-  let p;
-  if (T === 1) p = [['INTRO', 16], ['GROOVE', pick([8, 16])], ['BUILD', 8], ['PEAK', pick([16, 24])], ['BREAK', pick([8, 16])], ['PEAK II', pick([24, 32])], ['OUTRO', 16]];
-  else if (T === 2) p = [['INTRO', 16], ['GROOVE', 16], ['PEAK', 16], ['BASS SOLO', pick([4, 8])], ['REBUILD', 16], ['PEAK II', pick([16, 24])], ['OUTRO', 16]];
-  else p = [['INTRO', 16], ['GROOVE', pick([8, 16])], ['HALFTIME', 8], ['BUILD', 8], ['PEAK', pick([16, 24])], ['BASS SOLO', 4], ['REBUILD', 8], ['PEAK II', 16], ['OUTRO', 16]];
-  return p.map(([name, bars]) => ({ name, bars }));
+const PLAN_T = {
+  classic: [['INTRO', 16], ['GROOVE', [8, 16]], ['BUILD', 8], ['PEAK', [16, 24]], ['BREAK', [8, 16]], ['PEAK II', [24, 32]], ['OUTRO', 16]],
+  solo: [['INTRO', 16], ['GROOVE', 16], ['PEAK', 16], ['BASS SOLO', [4, 8]], ['REBUILD', 16], ['PEAK II', [16, 24]], ['OUTRO', 16]],
+  half: [['INTRO', 16], ['GROOVE', [8, 16]], ['HALFTIME', 8], ['BUILD', 8], ['PEAK', [16, 24]], ['BASS SOLO', 4], ['REBUILD', 8], ['PEAK II', 16], ['OUTRO', 16]],
+  hypnotic: [['INTRO', 16], ['GROOVE', 24], ['PEAK', 16], ['BREAK', 8], ['PEAK II', 24], ['OUTRO', 16]],
+  banger: [['INTRO', 16], ['GROOVE', 8], ['BUILD', 8], ['PEAK', 24], ['BUILD', 4], ['PEAK II', 24], ['OUTRO', 16]],
+  closing: [['INTRO', 16], ['GROOVE', 16], ['BREAK', 16], ['REBUILD', 16], ['PEAK', 16], ['OUTRO', 16]],
+};
+const PLAN_W = [
+  { hypnotic: 3, classic: 2, solo: 2, closing: 1 },
+  { classic: 3, solo: 2, half: 2, hypnotic: 1 },
+  { banger: 3, classic: 2, solo: 2, half: 1 },
+  { closing: 3, hypnotic: 2, solo: 1 },
+];
+function makePlan(phase = 1) {
+  const w = PLAN_W[phase] || PLAN_W[1];
+  const names = Object.keys(w).filter((n) => !setMem.plans.slice(-1).includes(n));
+  let total = names.reduce((a, n) => a + w[n], 0), r = R() * total, id = names[0];
+  for (const n of names) { r -= w[n]; if (r <= 0) { id = n; break; } }
+  remember('plans', id);
+  return PLAN_T[id].map(([name, bars]) => ({ name, bars: Array.isArray(bars) ? pick(bars) : bars }));
 }
 const ALL = { kick: 1, hat: 1, open: 1, perc: 1, ride: 1, clap: 1, metal: 1, bass: 1, stab: 1, noise: 1, pad: 0, extra: 0 };
-function sectionLayers(name, k) {
+function sectionLayersRaw(name, k) {
   switch (name) {
-    case 'INTRO': return { ...ALL, hat: k < 0.25 ? 0.45 : 1, open: k < 0.5 ? 0 : 1, perc: k < 0.375 ? 0 : 1, ride: k < 0.75 ? 0 : 0.6, clap: 0, metal: 0, bass: k < 0.75 ? 0 : 1, stab: 0, noise: k < 0.5 ? 0.6 : 0.3 };
+    case 'INTRO': return { ...ALL, hat: k < 0.25 ? 0.45 : 1, open: k < 0.5 ? 0 : 1, perc: k < 0.375 ? 0 : 1, ride: k < 0.75 ? 0 : 0.6, clap: 0, metal: 0, bass: k < 0.75 ? 0 : 1, stab: 0, noise: k < 0.5 ? 0.6 : 0.3, shaker: k < 0.25 ? 0 : 1, rim: k < 0.5 ? 0 : 1, snare: 0 };
     case 'GROOVE': return { ...ALL, metal: 0.5, stab: 0.6, noise: 0.5 };
     case 'BUILD': return { ...ALL, bass: k < 0.75 ? 1 : 0 };
     case 'PEAK': return { ...ALL };
-    case 'BREAK': return { ...ALL, kick: 0, hat: k < 0.5 ? 0 : 0.5, open: 0, perc: 0.5, ride: 0, clap: 0, metal: 0, bass: 0, stab: 0, pad: 1 };
+    case 'BREAK': return { ...ALL, kick: 0, hat: k < 0.5 ? 0 : 0.5, open: 0, perc: 0.5, ride: 0, clap: 0, metal: 0, bass: 0, stab: 0, pad: 1, snare: 0 };
     case 'PEAK II': return { ...ALL, extra: 1 };
     case 'BASS SOLO': return { kick: 0, hat: 0, open: 0, perc: 0, ride: 0, clap: 0, metal: 0, bass: 1, stab: 0, noise: 0.3, pad: 0, extra: 0, bassLong: 1 };
     case 'REBUILD': return { ...ALL, kick: k >= 0.125 ? 1 : 0, hat: k >= 0.25 ? 1 : 0, open: k >= 0.375 ? 1 : 0, perc: k >= 0.5 ? 1 : 0, ride: k >= 0.625 ? 1 : 0, clap: k >= 0.75 ? 1 : 0, metal: k >= 0.875 ? 1 : 0, stab: k >= 0.5 ? 0.6 : 0, noise: 0.4 };
     case 'HALFTIME': return { ...ALL, half: 1, open: 0, ride: 0, metal: 0, perc: 0.5, stab: 0, pad: 1, noise: 0.5 };
     case 'OUTRO': return { ...ALL, hat: k < 0.75 ? 1 : 0.5, open: k < 0.5 ? 1 : 0, perc: k < 0.625 ? 1 : 0, ride: k < 0.25 ? 1 : 0, clap: k < 0.375 ? 1 : 0, metal: k < 0.25 ? 0.5 : 0, bass: k < 0.5 ? 1 : 0, stab: k < 0.25 ? 0.5 : 0, noise: 0.4 };
     default: return { ...ALL };
+  }
+}
+// newer layers follow their closest relative unless a section says otherwise
+function fillLayers(L) {
+  if (L.rim === undefined) L.rim = L.perc;
+  if (L.shaker === undefined) L.shaker = L.hat;
+  if (L.snare === undefined) L.snare = L.clap;
+  return L;
+}
+const sectionLayers = (name, k) => fillLayers(sectionLayersRaw(name, k));
+// how far the song's hook is "open" in each part of the song
+function hookOpen(name, k) {
+  switch (name) {
+    case 'INTRO': return k > 0.75 ? 0.2 : 0;
+    case 'GROOVE': return 0.3 + 0.35 * k;
+    case 'BUILD': return 0.55 + 0.4 * k;
+    case 'PEAK': case 'PEAK II': return 1;
+    case 'BREAK': return 0.45;
+    case 'BASS SOLO': return 0;
+    case 'REBUILD': return k < 0.5 ? 0 : 0.3 + 0.6 * k;
+    case 'HALFTIME': return 0.4;
+    case 'OUTRO': return Math.max(0, 0.9 - k * 1.4);
+    default: return 0;
   }
 }
 // master filter automation per section: lp/hp in 0..1
@@ -775,9 +988,9 @@ function sectionMaster(name, k) {
   return { lp: 1, hp: 0 };
 }
 // genre change: 8-bar DJ-style blend
-const SWITCH_AT = { hat: 0.125, open: 0.125, perc: 0.375, ride: 0.375, metal: 0.5, noise: 0.5, clap: 0.625, stab: 1, pad: 0.375, kick: 0.75, bass: 1 };
+const SWITCH_AT = { hat: 0.125, open: 0.125, shaker: 0.125, perc: 0.375, rim: 0.375, ride: 0.375, metal: 0.5, noise: 0.5, clap: 0.625, snare: 0.625, stab: 1, pad: 0.375, kick: 0.75, bass: 1 };
 function transLayers(k) {
-  return { ...ALL, kick: k < 0.875 ? 1 : 0, clap: k < 0.5 ? 1 : 0, bass: k < 0.375 ? 1 : 0, stab: 0, pad: k >= 0.375 && k < 0.875 ? 1 : 0, ride: 1 };
+  return fillLayers({ ...ALL, kick: k < 0.875 ? 1 : 0, clap: k < 0.5 ? 1 : 0, bass: k < 0.375 ? 1 : 0, stab: 0, pad: k >= 0.375 && k < 0.875 ? 1 : 0, ride: 1 });
 }
 
 // ============================================================ state
@@ -789,7 +1002,7 @@ const state = {
   auto: { y: 0.5, ty: 0.5 },
 };
 const seq = {
-  song: genSong('HYPNO', null), next: null, plan: makePlan(), sec: 0, secBar: -1, songBar: -1, step16: 0,
+  song: genSong('HYPNO', null), next: null, plan: makePlan(0), sec: 0, secBar: -1, songBar: -1, step16: 0,
   bpm: 132, ramp: null, trans: null, pendingWorld: null, songTime: 0, totalBars: 0, worldKey: 'HYPNO',
   nextReq: false, skipNow: false, nextByUser: false,
 };
@@ -892,8 +1105,17 @@ function createAudio() {
   vPost.connect(comb); comb.connect(combFb); combFb.connect(comb); comb.connect(combG); combG.connect(vOut);
   vOut.connect(mDrive); vOut.connect(vDly); vDly.connect(dlySend); vOut.connect(vRev); vRev.connect(revSend);
 
+  // performance sends: delay throws and reverb washes (DJ moves)
+  const throwSend = Gn(0); dIn.connect(throwSend); sIn.connect(throwSend); throwSend.connect(dlySend);
+  const fbX = Gn(0); dR.connect(fbX); fbX.connect(dL);
+  const washG = Gn(0); dBus.connect(washG); sOut.connect(washG); washG.connect(revSend);
+  // hook voices get their own drive
+  const hIn = Gn(1); const hSh = shaper(2.2, '2x'); const hOut = Gn(0.9); hIn.connect(hSh); hSh.connect(hOut); hOut.connect(sIn);
+
   const events = [];
   const fire = (time, voice, lane, vel = 1) => events.push({ time, voice, lane, vel });
+  const kit = () => seq.song.kit;
+  const drift = (name) => { const l = seq.song.lfo[name]; return Math.sin((2 * Math.PI * seq.songTime) / l[0] + l[1]); };
 
   // ---------------------------------------------------------- voices
   function kickParams() {
@@ -905,22 +1127,25 @@ function createAudio() {
     ][sound.DRUMS.model];
   }
   function kick(t, vel = 1) {
-    const k = kickParams(), f = k.tune;
+    const k = kickParams(), K = kit(), f = k.tune + K.kickTune;
+    const decay = k.decay * K.kickDecay;
     const o = ac.createOscillator(); o.type = 'sine';
-    o.frequency.setValueAtTime(f * k.punch, t); o.frequency.exponentialRampToValueAtTime(f * 1.6, t + 0.016);
-    o.frequency.exponentialRampToValueAtTime(f, t + 0.085); o.frequency.linearRampToValueAtTime(f * 0.9, t + k.decay);
+    o.frequency.setValueAtTime(f * k.punch * K.kickPunch, t); o.frequency.exponentialRampToValueAtTime(f * 1.6, t + 0.016);
+    o.frequency.exponentialRampToValueAtTime(f, t + 0.085); o.frequency.linearRampToValueAtTime(f * 0.9, t + decay);
     const g = Gn(0);
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + 0.0015);
-    g.gain.setValueAtTime(vel, t + 0.02 + k.decay * 0.15); g.gain.exponentialRampToValueAtTime(0.0005, t + k.decay);
-    o.connect(g); g.connect(kIn); o.start(t); o.stop(t + k.decay + 0.05);
+    g.gain.setValueAtTime(vel, t + 0.02 + decay * 0.15); g.gain.exponentialRampToValueAtTime(0.0005, t + decay);
+    o.connect(g); g.connect(kIn); o.start(t); o.stop(t + decay + 0.05);
     const n = noiseSrc(t, 0.03); const bp = F('bandpass', 3500, 0.8); const ng = Gn(0);
-    ng.gain.setValueAtTime(vel * k.click, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
+    ng.gain.setValueAtTime(vel * Math.min(1.4, k.click * K.click), t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
     n.connect(bp); bp.connect(ng); ng.connect(kIn);
     duck.gain.cancelScheduledValues(t);
     duck.gain.setTargetAtTime(0.22, t, 0.004);
     duck.gain.setTargetAtTime(1, t + 0.03, 0.065);
   }
   function hat(t, vel, decay, toneF = 8000) {
+    toneF = Math.min(12000, toneF * kit().hatTone);
+    decay *= kit().hatDecay;
     const mg = Gn(1.5); const n = noiseSrc(t, decay + 0.1); const ng = Gn(sound.DRUMS.model === 2 ? 0.3 : 0.5);
     const bp = F('bandpass', toneF + 2000, 0.6); const hp = F('highpass', toneF, 0.9); const g = Gn(0);
     metal.connect(mg); mg.connect(bp); n.connect(ng); ng.connect(bp); bp.connect(hp); hp.connect(g); g.connect(dIn);
@@ -929,8 +1154,8 @@ function createAudio() {
     setTimeout(() => { try { metal.disconnect(mg); } catch (e) { /* gone */ } }, Math.max(0, (t - ac.currentTime + decay + 0.15) * 1000));
   }
   function clap(t, vel, wet = 0.4) {
-    const n = noiseSrc(t, 0.6); const hp = F('highpass', 700); const bp = F('bandpass', 1300, 1.5); const g = Gn(0); const w = Gn(wet);
-    const sp = 0.011, v = vel * 1.5;
+    const n = noiseSrc(t, 0.6); const hp = F('highpass', 700); const bp = F('bandpass', kit().clapTone, 1.5); const g = Gn(0); const w = Gn(wet);
+    const sp = kit().clapSpread, v = vel * 1.5;
     g.gain.setValueAtTime(0, t);
     for (let k = 0; k < 3; k++) { g.gain.setValueAtTime(v, t + k * sp); g.gain.exponentialRampToValueAtTime(v * 0.12, t + k * sp + sp * 0.95); }
     g.gain.setValueAtTime(v, t + 3 * sp); g.gain.exponentialRampToValueAtTime(0.001, t + 3 * sp + 0.3);
@@ -950,8 +1175,133 @@ function createAudio() {
     [1, 1.593, 2.135, 2.295, 2.917, 3.598].forEach((m, i) => { const bp = F('bandpass', f * m, q * (1 - i * 0.06)); eg.connect(bp); bp.connect(sum); });
     sum.connect(sh); sh.connect(dest); sh.connect(w); w.connect(revSend);
   }
+  function snare(t, vel) {
+    const f = kit().snareTone;
+    const o = ac.createOscillator(); o.type = 'triangle';
+    o.frequency.setValueAtTime(f * 1.4, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.03);
+    const og = Gn(0); og.gain.setValueAtTime(vel * 0.55, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    o.connect(og); og.connect(dIn); o.start(t); o.stop(t + 0.15);
+    const n = noiseSrc(t, 0.25); const hp = F('highpass', 1500); const bp = F('bandpass', 4200, 0.7); const ng = Gn(0);
+    ng.gain.setValueAtTime(vel * 0.75, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.17);
+    n.connect(hp); hp.connect(bp); bp.connect(ng); ng.connect(dIn);
+  }
+  function rim(t, vel) {
+    const f = kit().rimTone;
+    const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f * 0.5;
+    const bp = F('bandpass', f, 8); const g = Gn(0);
+    g.gain.setValueAtTime(vel * 1.2, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+    o.connect(bp); bp.connect(g); g.connect(dIn); o.start(t); o.stop(t + 0.05);
+    const n = noiseSrc(t, 0.02); const nh = F('highpass', 3000); const ng = Gn(0);
+    ng.gain.setValueAtTime(vel * 0.4, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.006);
+    n.connect(nh); nh.connect(ng); ng.connect(dIn);
+  }
+  function shaker(t, vel) {
+    const n = noiseSrc(t, 0.12); const hp = F('highpass', 6000); const bp = F('bandpass', 9000, 1); const g = Gn(0);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + 0.008); g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+    n.connect(hp); hp.connect(bp); bp.connect(g); g.connect(dIn);
+  }
+  function perc(t, vel, n, pp) {
+    const type = kit().percType;
+    const wob = 1 + 0.04 * drift('perc');
+    if (type === 'tom') return tom(t, vel, TOMS[n % 5] * pp * wob);
+    if (type === 'conga') {
+      const f = (190 + (n % 5) * 48) * pp * wob;
+      const o = ac.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(f * 1.15, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.02);
+      const g = Gn(0); g.gain.setValueAtTime(vel * 1.1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      const s2 = Gn(0.2); o.connect(g); g.connect(dIn); g.connect(s2); s2.connect(dlySend); o.start(t); o.stop(t + 0.2);
+      const ns = noiseSrc(t, 0.02); const nb = F('bandpass', 2500, 1.5); const ng = Gn(0);
+      ng.gain.setValueAtTime(vel * 0.5, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.008);
+      ns.connect(nb); nb.connect(ng); ng.connect(dIn);
+      return;
+    }
+    if (type === 'wood') {
+      const ns = noiseSrc(t, 0.06); const bp = F('bandpass', (900 + (n % 5) * 260) * wob, 14); const g = Gn(0);
+      g.gain.setValueAtTime(vel * 3, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+      const s2 = Gn(0.3); ns.connect(bp); bp.connect(g); g.connect(dIn); g.connect(s2); s2.connect(dlySend);
+      return;
+    }
+    // fm blip
+    const f = (140 + (n % 5) * 55) * pp * wob;
+    const car = ac.createOscillator(); car.type = 'sine'; car.frequency.value = f;
+    const mod = ac.createOscillator(); mod.type = 'sine'; mod.frequency.value = f * 2.4;
+    const mg = Gn(0); mg.gain.setValueAtTime(f * 4, t); mg.gain.exponentialRampToValueAtTime(1, t + 0.1);
+    mod.connect(mg); mg.connect(car.frequency);
+    const g = Gn(0); g.gain.setValueAtTime(vel * 0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    const s2 = Gn(0.25); car.connect(g); g.connect(dIn); g.connect(s2); s2.connect(dlySend);
+    car.start(t); mod.start(t); car.stop(t + 0.16); mod.stop(t + 0.16);
+  }
+
+  // ---------------------------------------------------------- hook voices
+  let acidPrev = null;
+  function hookAcid(t, deg, st, open, sd) {
+    const f = hz(53 + root() + semi(deg));
+    const o = ac.createOscillator(); o.type = kit().acidWave;
+    if (acidPrev && acidPrev.slide && t - acidPrev.t < sd * 1.6) { o.frequency.setValueAtTime(acidPrev.f, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.06); }
+    else o.frequency.setValueAtTime(f, t);
+    const filt = F('lowpass', 300, 12 + open * 10 + (st.acc ? 4 : 0));
+    const base = 180 + open * 1600;
+    filt.frequency.setValueAtTime(Math.min(12000, base * (st.acc ? 6 : 3.5)), t);
+    filt.frequency.setTargetAtTime(base, t + 0.003, st.acc ? 0.05 : 0.09);
+    const a = Gn(0); const lv = (st.acc ? 0.2 : 0.13) * (0.5 + open * 0.5);
+    const gate = sd * (st.slide ? 1.05 : 0.6);
+    a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(lv, t + 0.003); a.gain.setValueAtTime(lv, t + gate); a.gain.setTargetAtTime(0, t + gate, 0.01);
+    o.connect(filt); filt.connect(a); a.connect(hIn); o.start(t); o.stop(t + gate + 0.1);
+    acidPrev = { f, slide: st.slide, t };
+  }
+  function hookBell(t, deg, open, vel) {
+    const f = hz(65 + root() + semi(deg));
+    const car = ac.createOscillator(); car.type = 'sine'; car.frequency.value = f;
+    const mod = ac.createOscillator(); mod.type = 'sine'; mod.frequency.value = f * kit().bellRatio;
+    const mg = Gn(0); mg.gain.setValueAtTime(f * (0.6 + open * 2.4), t); mg.gain.exponentialRampToValueAtTime(f * 0.05, t + 0.35);
+    mod.connect(mg); mg.connect(car.frequency);
+    const g = Gn(0); const d = 0.5 + open * 0.7;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.11 * vel, t + 0.002); g.gain.exponentialRampToValueAtTime(0.001, t + d);
+    car.connect(g); g.connect(sIn); car.start(t); mod.start(t); car.stop(t + d + 0.05); mod.stop(t + d + 0.05);
+  }
+  const VOWELS = { a: [760, 1300, 2500], e: [420, 2100, 2700], o: [420, 820, 2450], u: [320, 720, 2300] };
+  function hookVox(t, deg, vowel, open, vel, dur) {
+    const f = hz(53 + root() + semi(deg));
+    const src = Gn(1);
+    for (const d of [-8, 8]) { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(src); o.start(t); o.stop(t + dur + 0.2); }
+    const lp = F('lowpass', 1400 + open * 5000, 0.7); const g = Gn(0);
+    (VOWELS[vowel] || VOWELS.a).forEach((fr, i) => { const bp = F('bandpass', fr, 9); const fg = Gn([1.6, 1.1, 0.6][i]); src.connect(bp); bp.connect(fg); fg.connect(lp); });
+    const lv = 0.16 * vel * (0.55 + open * 0.45);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(lv, t + 0.012); g.gain.setValueAtTime(lv, t + dur * 0.75); g.gain.setTargetAtTime(0, t + dur * 0.75, 0.05);
+    lp.connect(g); g.connect(sIn);
+  }
+  function hookNoise(t, deg, open, vel) {
+    const f = (260 + open * 1400) * Math.pow(2, semi(deg) / 12);
+    const n = noiseSrc(t, 0.12); const bp = F('bandpass', f, 16); const sh = shaper(4, '2x'); const g = Gn(0);
+    g.gain.setValueAtTime(vel * 1.6, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05 + open * 0.05);
+    n.connect(bp); bp.connect(sh); sh.connect(g); g.connect(nIn);
+  }
+  function hookLead(t, deg, open, vel, dur) {
+    const f = hz(65 + root() + semi(deg));
+    const lp = F('lowpass', 700 + open * 3200, 1.2); const g = Gn(0);
+    for (const d of [-12, 0, 12]) { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(lp); o.start(t); o.stop(t + dur + 0.6); }
+    const lv = 0.06 * vel * (0.5 + open * 0.5);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(lv, t + 0.12); g.gain.setValueAtTime(lv, t + dur * 0.9); g.gain.setTargetAtTime(0, t + dur * 0.9, 0.18);
+    lp.connect(g); g.connect(sIn);
+  }
+  function hookNote(t, st, h, open, sd) {
+    const deg = state.home + st.deg;
+    const vel = (st.acc ? 1 : 0.75) * (0.6 + 0.4 * open);
+    switch (h.type) {
+      case 'acid': hookAcid(t, deg, st, open, sd); break;
+      case 'stabriff': synth(t, deg, 'stab', 0.15 + 0.7 * open, vel); break;
+      case 'bell': hookBell(t, deg, open, vel); break;
+      case 'vox': hookVox(t, deg, st.vowel, open, vel, (st.dur || 1) * sd); break;
+      case 'seq': synth(t, deg, 'pluck', 0.12 + 0.75 * open, vel * 0.85); break;
+      case 'noiseloop': hookNoise(t, deg, open, vel); break;
+      case 'lead': hookLead(t, deg, open, vel, (st.dur || 4) * sd); break;
+      default: break;
+    }
+  }
+
   function bass(t, deg, dur, vel, tone) {
     const S = sound.BASS, m = S.model;
+    tone = clamp(tone + 0.07 * drift('tone'), 0, 1);
     const f = hz(41 + root() + semi(deg) + (m === 1 ? 12 : 0));
     const filt = F('lowpass', 200, m === 1 ? 5 + tone * 16 : 1 + tone * 6);
     const cut = 50 * Math.pow(2, 1 + tone * 6.4);
@@ -1110,7 +1460,7 @@ function createAudio() {
       if (tr.bar >= tr.bars) {
         // land in the new world at its groove section
         seq.song = tr.to; seq.worldKey = tr.to.world; seq.trans = null; seq.next = null;
-        seq.plan = makePlan(); seq.sec = 1; seq.secBar = 0; seq.songBar = 0; seq.songTime = 0;
+        seq.plan = makePlan(seq.song.phase); seq.sec = 1; seq.secBar = 0; seq.songBar = 0; seq.songTime = 0; seq.moment = null;
         applySongSound(seq.song, ['BASS', 'SYNTH', 'NOISE']);
         impact(t);
         jumped = true;
@@ -1138,7 +1488,7 @@ function createAudio() {
       if (seq.sec >= seq.plan.length) {
         seq.song = seq.next || genSong(seq.song.world, seq.song);
         seq.next = null; seq.nextByUser = false;
-        seq.plan = makePlan(); seq.sec = 0; seq.songBar = 0; seq.songTime = 0;
+        seq.plan = makePlan(seq.song.phase); seq.sec = 0; seq.songBar = 0; seq.songTime = 0; seq.moment = null;
         applySongSound(seq.song);
         if (A) A.songStarted(t, seq.song);
       }
@@ -1157,9 +1507,24 @@ function createAudio() {
     if (seq.songBar % 4 === 0 && seq.songBar > 0 && R() < 0.35 + state.evolve * 0.65) mutate(seq.song, state.evolve);
     if (seq.songBar % 16 === 0 && seq.songBar > 0) relax(seq.song);
 
+    // DJ moments: one per 8-bar phrase at most, more with EVOLVE
+    if (seq.secBar % 8 === 0) {
+      seq.moment = null;
+      if (['GROOVE', 'PEAK', 'PEAK II'].includes(sec.name) && sec.bars - seq.secBar >= 8 && R() < 0.25 + state.evolve * 0.45) {
+        const type = pick(sec.name === 'GROOVE' ? ['throw', 'filterride', 'roll'] : ['kickout', 'throw', 'filterride', 'roll', 'stop', 'wash']);
+        const at = seq.secBar;
+        const bars = { stop: [at + 7], roll: [at + 7], wash: [at + 7], kickout: [at + 4, at + 5], filterride: [at + 4, at + 5], throw: [at + pick([3, 7])] }[type];
+        seq.moment = { type, bars };
+      }
+    }
+    seq.mNow = seq.moment && seq.moment.bars.includes(seq.secBar) ? seq.moment.type : null;
     const k = (seq.secBar + 1) / sec.bars;
-    setMaster(t, sectionMaster(sec.name, k), barDur);
-    const dt = 60 / seq.bpm * 0.75;
+    const mst = sectionMaster(sec.name, k);
+    if (seq.mNow === 'filterride' && seq.moment.bars[0] === seq.secBar) mst.lp = 0.45;
+    setMaster(t, mst, barDur);
+    if (seq.mNow === 'wash') { washG.gain.setTargetAtTime(0.9, t + barDur * 0.5, 0.1); washG.gain.setTargetAtTime(0, t + barDur, 0.4); }
+    if (seq.mNow === 'throw') { fbX.gain.setTargetAtTime(0.3, t, 0.05); fbX.gain.setTargetAtTime(0, t + barDur * 2, 0.5); }
+    const dt = 60 / seq.bpm * seq.song.kit.delayDiv;
     dL.delayTime.setTargetAtTime(dt, t, 0.2); dR.delayTime.setTargetAtTime(dt, t, 0.2);
     ui.dirty = true;
   }
@@ -1177,7 +1542,8 @@ function createAudio() {
     const src = (layer) => (tr && kSec >= (SWITCH_AT[layer] ?? 1) ? tr.to : song);
     const val = (layer) => src(layer).live[layer][lp] * (L[layer] ?? 0);
     const E = state.evolve;
-    const hitP = (v) => v >= 1 || (v > 0 && R() < v * (0.55 + E * 0.45));
+    const dens = 0.85 + (song.energy ?? 0.5) * 0.3;
+    const hitP = (v) => v >= 1 || (v > 0 && R() < v * (0.55 + E * 0.45) * dens);
     const swing = (src('hat').swing || 0) + sound.DRUMS.motion * 0.1;
     const tt = t + (p % 2 ? swing * sd * 0.6 : 0);
     const touch = state.touch;
@@ -1190,35 +1556,57 @@ function createAudio() {
     const tNoise = !!touch && (touch.voice === 'NOISE' || (isAuto && touch.y > 0.72));
 
     // DRUMS — arrangement decides, a finger on DRUMS overrides the layer stack
-    let D = { kick: L.kick, hat: L.hat, open: L.open, perc: L.perc, ride: L.ride, clap: L.clap, metal: L.metal, extra: L.extra };
+    let D = { kick: L.kick, hat: L.hat, open: L.open, perc: L.perc, ride: L.ride, clap: L.clap, metal: L.metal, extra: L.extra, rim: L.rim, shaker: L.shaker, snare: L.snare };
     if (tDrums) {
       const n = isAuto ? Math.round(clamp(touch.y, 0, 1) * 7) : touch.lane;
-      D = { kick: 1, hat: n >= 1 ? 1 : 0, open: n >= 2 ? 1 : 0, perc: n >= 3 ? 1 : 0, ride: n >= 4 ? 1 : 0, clap: n >= 5 ? 1 : 0, metal: n >= 6 ? 1 : 0, extra: n >= 7 ? 1 : 0 };
+      D = { kick: 1, hat: n >= 1 ? 1 : 0, shaker: n >= 1 ? 1 : 0, open: n >= 2 ? 1 : 0, perc: n >= 3 ? 1 : 0, rim: n >= 3 ? 1 : 0, ride: n >= 4 ? 1 : 0, clap: n >= 5 ? 1 : 0, snare: n >= 5 ? 1 : 0, metal: n >= 6 ? 1 : 0, extra: n >= 7 ? 1 : 0 };
     }
     const dv = (layer) => src(layer).live[layer][lp] * (D[layer] ?? 0);
+    const vl = (layer) => src(layer).live.V[layer][lp] || 0.7;
+    const feel = src('hat').feel;
+    const acc = feel.accent[p % feel.accent.length];
+    const jit = (sec) => (R() - 0.5) * sec;
+    const hum = (x) => x * (1 + (R() - 0.5) * feel.human);
+    const mute = !tr && seq.mNow === 'stop' && p >= 12;
+    const kickOff = !tr && seq.mNow === 'kickout';
+    const throwIt = !tr && seq.mNow === 'throw';
+    const doThrow = (time) => { throwSend.gain.setValueAtTime(0.85, time); throwSend.gain.setValueAtTime(0, time + sd * 0.9); };
+    const pp = WORLDS[src('perc').world].percPitch;
     const buildEnd = !tr && (secName === 'BUILD') && lastBarOf(seq.plan[seq.sec].bars) && p >= 12;
     const half = L.half && !tDrums;
-    if (half ? (p === 0 || p === 8) : (hitP(dv('kick')) && !buildEnd)) { kick(t, 1); fire(t, 'DRUMS', 0); }
-    if (D.extra && p % 4 === 3 && R() < 0.4) kick(tt, 0.5);
-    if (half ? p % 4 === 2 && R() < 0.8 : hitP(dv('hat'))) { hat(tt, 0.15 + (p % 2) * 0.05, 0.03 + v.DRUMS * 0.03, 8500); fire(tt, 'DRUMS', 1, 0.5); }
-    else if (D.hat && R() < sound.DRUMS.motion * 0.25) hat(tt, 0.08, 0.025, 9500);
-    if (hitP(dv('open'))) { hat(tt, 0.28, 0.14 + v.DRUMS * 0.2, 7000); fire(tt, 'DRUMS', 2); }
-    if (hitP(dv('perc'))) {
-      const n = src('perc').live.percN[lp] || 0;
-      tom(tt, 0.18 + v.DRUMS * 0.15, TOMS[n % 5] * WORLDS[src('perc').world].percPitch);
-      fire(tt, 'DRUMS', 3);
+    if (!mute) {
+      if (half ? (p === 0 || p === 8) : (hitP(dv('kick')) && !buildEnd && !kickOff)) { kick(t, Math.min(1, hum(0.8 + 0.2 * vl('kick')))); fire(t, 'DRUMS', 0); }
+      if (D.extra && p % 4 === 3 && R() < 0.4) kick(tt, 0.5);
+      const ht = tt + feel.hatPush + jit(0.003);
+      if (half ? p % 4 === 2 && R() < 0.8 : hitP(dv('hat'))) { hat(ht, hum(0.05 + 0.2 * vl('hat') * acc), (0.03 + v.DRUMS * 0.03) * (1 + 0.3 * drift('hat')), 8500); fire(tt, 'DRUMS', 1, 0.5); }
+      else if (D.hat && R() < sound.DRUMS.motion * 0.25) hat(ht, 0.07, 0.025, 9500);
+      if (hitP(dv('open'))) { hat(tt + feel.openLag, hum(0.3 * vl('open')), 0.14 + v.DRUMS * 0.2, 7000); fire(tt, 'DRUMS', 2); }
+      if (hitP(dv('shaker'))) shaker(tt + feel.hatPush * 1.5 + jit(0.004), hum(0.2 * vl('shaker') * acc));
+      if (hitP(dv('perc'))) {
+        const n = src('perc').live.percN[lp] || 0;
+        perc(tt + jit(feel.percJit), hum((0.2 + v.DRUMS * 0.15) * vl('perc')), n, pp);
+        fire(tt, 'DRUMS', 3);
+      }
+      if (hitP(dv('rim'))) { rim(tt + jit(0.003), hum(0.3 * vl('rim'))); fire(tt, 'DRUMS', 3, 0.5); }
+      if (hitP(dv('ride'))) { hat(tt + jit(0.002), hum(0.1 * vl('ride')), 0.26, 5400); fire(tt, 'DRUMS', 4, 0.4); }
+      if (half ? p === 12 : hitP(dv('clap'))) {
+        const ct = tt + feel.clapLag;
+        clap(ct, hum(half ? 0.75 : 0.62 * vl('clap')), half ? 0.7 : 0.25 + v.DRUMS * 0.4);
+        if (throwIt) doThrow(ct);
+        fire(tt, 'DRUMS', 5);
+      }
+      if (hitP(dv('snare'))) { const st2 = tt + feel.clapLag * 0.6; snare(st2, hum(0.75 * vl('snare'))); if (throwIt) doThrow(st2); fire(tt, 'DRUMS', 5); }
+      if (hitP(dv('metal'))) { metalHit(tt, hum(0.45 * vl('metal')), 190 + (lp * 37) % 240, 0.5, 3); fire(tt, 'DRUMS', 6); }
+      if (D.extra && R() < 0.35) hat(ht, 0.08, 0.025, 9500);
+      // fills: clap rolls at phrase ends, a full roll into drops, DJ snare rolls
+      if (!tr && D.clap && (secName === 'GROOVE' || secName === 'PEAK' || secName === 'PEAK II') && lastBarOf(8) && p >= 12 && seq.mNow !== 'roll') clap(tt, 0.25 + (p - 12) * 0.12, 0.2);
+      if (!tr && (secName === 'BUILD' || secName === 'BREAK') && lastBarOf(seq.plan[seq.sec].bars) && (p % 2 === 0 || p >= 8)) clap(tt, 0.15 + p * 0.04, 0.3);
+      if (tr && tr.bar === tr.bars - 1 && p >= 8) clap(tt, 0.15 + p * 0.04, 0.3);
+      if (!tr && seq.mNow === 'roll' && p >= 8) { snare(tt, 0.15 + (p - 8) * 0.07); if (p >= 12) snare(tt + sd / 2, 0.2 + (p - 8) * 0.07); }
     }
-    if (hitP(dv('ride'))) { hat(tt, 0.1, 0.26, 5400); fire(tt, 'DRUMS', 4, 0.4); }
-    if (half ? p === 12 : hitP(dv('clap'))) { clap(tt, half ? 0.75 : 0.6, half ? 0.7 : 0.25 + v.DRUMS * 0.4); fire(tt, 'DRUMS', 5); }
-    if (hitP(dv('metal'))) { metalHit(tt, 0.45, 190 + (lp * 37) % 240, 0.5, 3); fire(tt, 'DRUMS', 6); }
-    if (D.extra && R() < 0.35) hat(tt, 0.08, 0.025, 9500);
-    // fills: clap rolls at phrase ends, a full roll into drops
-    if (!tr && D.clap && (secName === 'GROOVE' || secName === 'PEAK' || secName === 'PEAK II') && lastBarOf(8) && p >= 12) clap(tt, 0.25 + (p - 12) * 0.12, 0.2);
-    if (!tr && (secName === 'BUILD' || secName === 'BREAK') && lastBarOf(seq.plan[seq.sec].bars) && (p % 2 === 0 || p >= 8)) clap(tt, 0.15 + p * 0.04, 0.3);
-    if (tr && tr.bar === tr.bars - 1 && p >= 8) clap(tt, 0.15 + p * 0.04, 0.3);
 
     // BASS
-    if (tBass) {
+    if (mute) { /* a beat of silence before the drop */ } else if (tBass) {
       if (p % 4 !== 0) { bass(tt, touch.lane, sd, p % 4 === 2 ? 1 : 0.75, v.BASS); fire(tt, 'BASS', touch.lane); }
     } else if (L.bassLong || half) {
       // slow passages: long notes that thunder through the rumble chain
@@ -1229,13 +1617,14 @@ function createAudio() {
       }
     } else if (hitP(val('bass'))) {
       const deg = clamp(state.home + src('bass').live.notes[lp], -3, 11);
-      bass(tt, deg, sd, p % 4 === 2 ? 1 : 0.72, v.BASS);
+      const bs = src('bass');
+      bass(tt + jit(0.002), deg, sd * (bs.bassDur || 1), hum(0.65 + 0.35 * (bs.live.V.bass[lp] || 0.8)), v.BASS);
       fire(tt, 'BASS', clamp(deg, 0, 7), 0.5);
     }
 
     // SYNTH
     const sm = sound.SYNTH.model;
-    if (tSynth) {
+    if (mute) { /* silence */ } else if (tSynth) {
       if (sm === 0) {
         const arp = [0, 2, 4, 6, 7, 4, 2, 4];
         const fast = sound.SYNTH.motion > 0.55 || v.SYNTH > 0.75;
@@ -1248,7 +1637,14 @@ function createAudio() {
     } else {
       const barRoot = state.home + src('bass').live.notes[lp - p];
       if (L.pad && p === 0) { synth(tt, barRoot, 'pad', v.SYNTH, 1, sd * 16 * 0.95); fire(tt, 'SYNTH', clamp(barRoot, 0, 7), 0.6); }
-      if (hitP(val('stab'))) {
+      // the song's hook: introduced, developed, fully open in the peaks
+      const hk = tr ? null : (secName === 'PEAK II' ? song.hook2 : song.hook);
+      const ho = hk ? hookOpen(secName, kSec) * (L.hook ?? 1) : 0;
+      if (hk && ho > 0.02) {
+        const st = hk.steps[lp % hk.len];
+        if (st && (secName !== 'BREAK' || lp % 2 === 0)) { hookNote(tt + jit(0.002), st, hk, ho, sd); fire(tt, 'SYNTH', clamp(state.home + st.deg, 0, 7), 0.6); }
+      }
+      if (hitP(val('stab') * (hk && ho > 0.5 ? 0.4 : 1))) {
         const kind = ['pluck', 'stab', 'pad'][sm];
         const d = kind === 'pluck' ? barRoot + pick([0, 2, 4, 7]) : barRoot;
         synth(tt, d, kind, v.SYNTH, 1, sd * 3);
@@ -1257,7 +1653,7 @@ function createAudio() {
     }
 
     // NOISE
-    if (tNoise) {
+    if (mute) { /* silence */ } else if (tNoise) {
       if (p % 2 === 1 && R() < 0.15 + v.NOISE * 0.5 + sound.NOISE.motion * 0.3) { noiseHit(tt, touch.lane, 0.5 + v.NOISE * 0.4); fire(tt, 'NOISE', touch.lane); }
     } else {
       const nv = val('noise') * (0.5 + sound.NOISE.motion);
@@ -1409,7 +1805,7 @@ $('worldBtn').addEventListener('click', () => {
   } else {
     seq.worldKey = nextKey;
     seq.song = genSong(nextKey, null); seq.song.num = 1;
-    seq.plan = makePlan(); seq.sec = 0; seq.secBar = -1; seq.songBar = -1; seq.step16 = 0; seq.songTime = 0;
+    seq.plan = makePlan(seq.song.phase); seq.sec = 0; seq.secBar = -1; seq.songBar = -1; seq.step16 = 0; seq.songTime = 0;
     seq.bpm = seq.song.bpm; seq.ramp = null;
     applySongSound(seq.song);
   }
@@ -1420,7 +1816,7 @@ $('worldBtn').addEventListener('click', () => {
 $('nextBtn').addEventListener('click', () => {
   if (!state.playing) {
     seq.song = genSong(seq.worldKey, seq.song);
-    seq.plan = makePlan(); seq.sec = 0; seq.secBar = -1; seq.songBar = -1; seq.step16 = 0; seq.songTime = 0;
+    seq.plan = makePlan(seq.song.phase); seq.sec = 0; seq.secBar = -1; seq.songBar = -1; seq.step16 = 0; seq.songTime = 0;
     seq.bpm = seq.song.bpm; seq.ramp = null;
     applySongSound(seq.song);
   } else if (seq.trans) {
@@ -1647,7 +2043,9 @@ function renderDisplay() {
   }
   $('tempo').textContent = `${Math.round(seq.bpm)} BPM · ${keyName(song.root)} MIN`;
   const dnaW = seq.trans ? WORLDS[seq.trans.to.world] : seq.pendingWorld ? WORLDS[seq.pendingWorld] : w;
-  $('dna').textContent = dnaW.dna;
+  // alternate between the world's DNA and this song's DNA (sub-style · hook · set phase)
+  const songDna = `${song.sub} · ${song.hook.label} · ${song.phaseName}`;
+  $('dna').textContent = !seq.trans && !seq.pendingWorld && Math.floor(performance.now() / 5000) % 2 ? songDna : dnaW.dna;
   const nb = $('nextBtn');
   const inOutro = !seq.trans && seq.plan[seq.sec] && seq.plan[seq.sec].name === 'OUTRO';
   nb.classList.toggle('armed', seq.nextReq || seq.skipNow || (inOutro && seq.nextByUser));
@@ -2280,7 +2678,7 @@ renderDisplay();
 draw();
 
 // test hook (used by automated checks only)
-window.__field1 = { seq, state, sound, REC, recFiles, jump(sec) { seq.sec = sec; seq.secBar = -1; } };
+window.__field1 = { seq, state, sound, REC, recFiles, genSong, makePlan, jump(sec) { seq.sec = sec; seq.secBar = -1; } };
 })();
 
 </script>
