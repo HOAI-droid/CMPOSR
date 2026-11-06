@@ -15,6 +15,8 @@ synthetisiert (Web Audio), es gibt keine Samples.
 | SOUND | Pro Stimme 3 Klangmodelle und 4 Regler (WEIGHT, GRIT, MOTION, SPACE) |
 | Weltname im Display | Genre wechseln – mit 8-Takt-Übergang wie im DJ-Mix |
 | EVOLVE | Wie stark sich der Groove von Loop zu Loop verändert |
+| VOL | Abhörlautstärke (beeinflusst die Aufnahme nicht) |
+| REC · SET | Nimmt jeden Song als eigene MP3 auf (geschnitten am Songwechsel), dazu das ganze Set als eine nahtlose MP3 und eine M3U-Playlist |
 
 ## Plattformen
 
@@ -43,5 +45,6 @@ npm run android        # öffnet das Projekt in Android Studio
 - `app/index.html`, `app/field.css`, `app/field.js` – die App
 - `app/manifest.webmanifest`, `app/sw.js`, `app/icons/` – Installation und Offline-Betrieb
 - `prototype/` – frühere Prototypen (CORE, ORBIT) und die Ein-Datei-Vorschau von FIELD-1
+- `app/vendor/lame.min.js` – MP3-Encoder [lamejs](https://github.com/zhuker/lamejs) (LGPL, siehe `app/vendor/lamejs-LICENSE.txt`), basiert auf [LAME](https://lame.sourceforge.io)
 - `tools/build_artifact.py` – baut `prototype/field.html` aus `app/`
 - `js/` – erste Fassung der Klang-Engine (wird von der App nicht mehr genutzt)

@@ -1,6 +1,6 @@
 // Offline support: the app shell is cached on install; fonts are cached when first used.
-const VERSION = 'field1-v1';
-const SHELL = ['./', 'index.html', 'field.css', 'field.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+const VERSION = 'field1-v2';
+const SHELL = ['./', 'index.html', 'field.css', 'field.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'vendor/lame.min.js'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

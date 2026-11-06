@@ -118,6 +118,41 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 .ribbon .fill { position: absolute; left: 0; top: 8px; height: 2px; background: var(--accent); }
 .ribbon .thumb { position: absolute; top: 0; width: 6px; height: 18px; margin-left: -3px; border-radius: 2px; background: var(--fg); }
 
+/* REC key, VOL knob */
+.rec { flex-direction: column; gap: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); }
+.rec .recdot { width: 12px; height: 12px; border-radius: 999px; background: #3a2418; }
+.rec[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.rec[aria-pressed="true"] .recdot { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: blink 1.2s steps(2, start) infinite; }
+@keyframes blink { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .rec[aria-pressed="true"] .recdot { animation: none; } }
+.vol { position: relative; width: 64px; height: 64px; flex: none; box-sizing: border-box; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); touch-action: none; cursor: ns-resize; display: flex; align-items: center; justify-content: center; }
+.vol svg { position: absolute; inset: 7px; width: 48px; height: 48px; }
+.vol .vl { position: relative; font-family: var(--mono); font-size: 8px; letter-spacing: 0.12em; color: var(--muted); margin-top: -10px; }
+.vol .vv { position: absolute; bottom: 9px; left: 0; right: 0; text-align: center; font-family: var(--mono); font-size: 10px; color: var(--fg); }
+.vol.active #volArc { stroke: var(--accent); }
+
+/* SET view: recordings */
+.set { grid-area: field; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); box-shadow: inset 0 2px 14px rgba(0,0,0,0.65); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.set .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); padding: 2px 2px 0; }
+.set .top b { color: var(--fg); font-weight: 500; }
+.set .top .live { color: var(--accent); }
+.reclist { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.recsess { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted); padding: 8px 2px 2px; }
+.recrow { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 6px 6px 12px; border-radius: 12px; background: var(--tile); border: 1px solid var(--line); }
+.recrow.setfile { border-color: #4a2a18; }
+.recrow.pending { opacity: 0.6; }
+.recrow .no { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 22px; flex: none; }
+.recrow .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.recrow .info b { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recrow .info span { font-family: var(--mono); font-size: 9px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recrow button { width: 44px; height: 40px; flex: none; border-radius: 10px; border: 1px solid var(--line); background: var(--key); font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--fg); display: flex; align-items: center; justify-content: center; }
+.recrow button.on { border-color: var(--accent); color: var(--accent); }
+.recactions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.recactions button { height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--key); font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); }
+.recactions button:disabled { opacity: 0.4; cursor: default; }
+.set .note { margin: 0; font-family: var(--mono); font-size: 10px; line-height: 1.6; color: var(--muted); padding: 0 2px; }
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); transform: translateX(-50%); z-index: 10; max-width: 86vw; padding: 10px 14px; border-radius: 10px; background: #262626; border: 1px solid var(--line); font-family: var(--mono); font-size: 11px; color: var(--fg); pointer-events: none; }
+
 @media (min-width: 860px) and (min-aspect-ratio: 1/1) {
   .device {
     max-width: 1280px;
@@ -133,7 +168,8 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 }
 @media (max-height: 700px) {
   .key { height: 50px; }
-  .play, .ribbon { height: 54px; }
+  .play, .ribbon, .vol { height: 54px; }
+  .vol svg { inset: 5px 8px; width: 44px; height: 44px; }
   .disp .main { min-height: 30px; }
   .disp .voice { font-size: 22px; }
   .knobs { grid-auto-rows: minmax(104px, 1fr); }
