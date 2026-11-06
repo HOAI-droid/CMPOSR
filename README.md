@@ -1,0 +1,47 @@
+# CMPOSR FIELD-1
+
+Generatives Techno-Instrument zum Spielen mit dem Finger. Ein Song baut sich selbst auf
+(Intro → Groove → Build → Peak → Break → Peak II → Outro) und geht nach 3–4 Minuten fließend
+in den nächsten Song über. Über das Feld spielst du live darüber. Alle Klänge werden in Echtzeit
+synthetisiert (Web Audio), es gibt keine Samples.
+
+## Bedienung
+
+| Element | Funktion |
+| --- | --- |
+| Feld links ↔ rechts | Ton (immer in der Tonart des Songs) bzw. Drum-Ebenen MIN…MAX |
+| Feld unten ↕ oben | Klang der gewählten Stimme |
+| DRUMS · BASS · SYNTH · NOISE | Stimme, die das Feld spielt |
+| SOUND | Pro Stimme 3 Klangmodelle und 4 Regler (WEIGHT, GRIT, MOTION, SPACE) |
+| Weltname im Display | Genre wechseln – mit 8-Takt-Übergang wie im DJ-Mix |
+| EVOLVE | Wie stark sich der Groove von Loop zu Loop verändert |
+
+## Plattformen
+
+**Web-App (PWA)** – der Ordner `app/` ist die komplette App, ohne Build-Schritt.
+
+```bash
+npm run serve          # lokal unter http://localhost:8080
+```
+
+Auf iPhone/iPad in Safari „Zum Home-Bildschirm“, auf Android in Chrome „App installieren“.
+Die App läuft danach im Vollbild und auch offline. Veröffentlichung im Netz: `.github/workflows/pages.yml`
+stellt `app/` auf GitHub Pages bereit (einmalig unter Settings → Pages → Source „GitHub Actions“ aktivieren).
+
+**iOS und Android (native Apps über Capacitor)** – dieselbe App in einer nativen Hülle.
+
+```bash
+npm install
+npx cap add ios        # einmalig, braucht einen Mac mit Xcode
+npx cap add android    # einmalig, braucht Android Studio
+npm run ios            # öffnet das Projekt in Xcode
+npm run android        # öffnet das Projekt in Android Studio
+```
+
+## Aufbau
+
+- `app/index.html`, `app/field.css`, `app/field.js` – die App
+- `app/manifest.webmanifest`, `app/sw.js`, `app/icons/` – Installation und Offline-Betrieb
+- `prototype/` – frühere Prototypen (CORE, ORBIT) und die Ein-Datei-Vorschau von FIELD-1
+- `tools/build_artifact.py` – baut `prototype/field.html` aus `app/`
+- `js/` – erste Fassung der Klang-Engine (wird von der App nicht mehr genutzt)

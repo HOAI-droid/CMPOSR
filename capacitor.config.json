@@ -1,0 +1,8 @@
+{
+  "appId": "com.cmposr.field1",
+  "appName": "FIELD-1",
+  "webDir": "app",
+  "backgroundColor": "#141414",
+  "ios": { "contentInset": "never", "allowsLinkPreview": false },
+  "android": { "backgroundColor": "#141414" }
+}

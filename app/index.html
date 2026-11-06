@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#141414">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FIELD-1">
+<meta name="description" content="CMPOSR FIELD-1 – generatives Techno-Instrument zum Spielen mit dem Finger.">
+<!-- HEAD START -->
+<title>CMPOSR Field-1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@500;600;700&display=swap">
+<!-- HEAD END -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="field.css">
+</head>
+<body>
+<!-- BODY START -->
+<div class="device">
+  <div class="head">
+    <b>CMPOSR</b>
+    <div class="right">
+      <div class="mode" role="group" aria-label="Ansicht">
+        <button type="button" id="modePlay" aria-pressed="true">FELD</button>
+        <button type="button" id="modeSound" aria-pressed="false">SOUND</button>
+      </div>
+      <i id="beatLed"></i>
+    </div>
+  </div>
+
+  <div class="disp">
+    <div class="row">
+      <button class="world" id="worldBtn" type="button" aria-label="Klangwelt wechseln"><b id="worldName">W01 · HYPNOTIC</b> ▸</button>
+      <span id="tempo">132 BPM · F MIN</span>
+    </div>
+    <div class="main">
+      <div class="voice" id="voiceName">BASS</div>
+      <canvas id="scope" aria-hidden="true"></canvas>
+    </div>
+    <div class="vals">
+      <span>NOTE<b id="vNote">F</b></span>
+      <span id="lblA">CUT<b id="vA">40</b></span>
+      <span id="lblB">GRIT<b id="vB">35</b></span>
+    </div>
+    <div class="steps" id="steps"></div>
+    <div class="song">
+      <div class="row"><span>SONG <b id="songNum">01</b> · <span class="sec" id="secName">INTRO</span></span><span id="songTime">00:00 / 03:40</span></div>
+      <div class="songbar" id="songbar"></div>
+    </div>
+  </div>
+
+  <div class="field" id="field">
+    <canvas id="fieldCanvas" aria-label="Spielfläche: links-rechts Tonhöhe, oben-unten Klang"></canvas>
+    <span class="lab tl" id="yLabel">↑ KLANG · FILTER + GRIT</span>
+    <div class="start" id="startHint">
+      <b>Feld berühren zum Spielen</b>
+      <span>links ↔ rechts Ton · unten ↕ oben Klang<br>Der Song baut sich von selbst auf</span>
+    </div>
+  </div>
+
+  <div class="sound" id="sound" hidden>
+    <div class="top"><span><b id="sndVoice">BASS</b> ENGINE</span><span id="sndLock">AUTO · WECHSELT MIT DEM SONG</span></div>
+    <div class="models" id="models" role="group" aria-label="Klangmodell"></div>
+    <div class="knobs" id="knobs"></div>
+    <p class="note">Ziehen zum Drehen, Doppeltipp setzt zurück. Alle Regler bleiben im club-tauglichen Bereich.</p>
+  </div>
+
+  <div class="voices" role="group" aria-label="Stimme">
+    <button class="key" type="button" data-voice="DRUMS" aria-pressed="false"><span class="led"></span>DRUMS</button>
+    <button class="key" type="button" data-voice="BASS" aria-pressed="true"><span class="led"></span>BASS</button>
+    <button class="key" type="button" data-voice="SYNTH" aria-pressed="false"><span class="led"></span>SYNTH</button>
+    <button class="key" type="button" data-voice="NOISE" aria-pressed="false"><span class="led"></span>NOISE</button>
+  </div>
+
+  <div class="trans">
+    <button class="play" id="playBtn" type="button" aria-pressed="false" aria-label="Play">
+      <svg id="playIcon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 3 L15 9 L5 15 Z" fill="#ff4f00"></path></svg>
+    </button>
+    <div class="ribbon" id="ribbon" role="slider" aria-label="Evolve" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40" tabindex="0">
+      <div class="row"><span>EVOLVE <b id="evoVal">40%</b></span><span>BAR <b id="barVal">0</b></span></div>
+      <div class="track"><div class="fill" id="evoFill"></div><div class="thumb" id="evoThumb"></div></div>
+    </div>
+  </div>
+</div>
+<!-- BODY END -->
+<script src="field.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script>
+</body>
+</html>
