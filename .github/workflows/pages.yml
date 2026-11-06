@@ -3,7 +3,7 @@
 name: Web-App veröffentlichen
 on:
   push:
-    branches: [main]
+    branches: [main, 'claude/zealous-pasteur-a1415l']
     paths: ['app/**']
   workflow_dispatch:
 permissions:
