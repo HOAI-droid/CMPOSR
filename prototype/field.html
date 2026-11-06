@@ -839,7 +839,7 @@ function createAudio() {
   // limiter -> recTap (what gets recorded) -> out (listening volume) -> speakers
   const out = Gn(0.92); out.connect(ac.destination);
   const analyser = ac.createAnalyser(); analyser.fftSize = 1024; out.connect(analyser);
-  const recTap = Gn(0.95); recTap.connect(out);
+  const recTap = Gn(0.82); recTap.connect(out);
   const limiter = comp(-2.5, 20, 0.001, 0.05, 0); limiter.connect(recTap);
   const glue = comp(-15, 3, 0.012, 0.14); glue.connect(limiter);
   const mHP = F('highpass', 18, 0.9); mHP.connect(glue);
@@ -1956,8 +1956,11 @@ const LAME_LOCAL = new URL('vendor/lame.min.js', document.baseURI).href;
 const LAME_CDN = 'https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js';
 const KBPS = 256;
 const WORKLET_SRC = `
+// Recording tap with a look-ahead brickwall limiter (ceiling -1 dBFS) so the MP3s never clip.
 class Tap extends AudioWorkletProcessor {
   constructor() { super(); this.n = 0; this.size = 4096; this.l = new Float32Array(this.size); this.r = new Float32Array(this.size); this.f0 = 0; this.on = true;
+    this.LA = Math.round(sampleRate * 0.004); this.dl = new Float32Array(this.LA); this.dr = new Float32Array(this.LA); this.di = 0;
+    this.env = 1; this.g = 1; this.ceil = 0.891; this.rel = Math.exp(-1 / (sampleRate * 0.15)); this.att = Math.exp(-1 / (sampleRate * 0.0008));
     this.port.onmessage = (e) => { if (e.data === 'stop') this.on = false; }; }
   process(inputs) {
     const inp = inputs[0];
@@ -1966,7 +1969,15 @@ class Tap extends AudioWorkletProcessor {
       const L = inp[0], Rr = inp[1] || inp[0];
       for (let i = 0; i < L.length; i++) {
         if (this.n === 0) this.f0 = currentFrame + i;
-        this.l[this.n] = L[i]; this.r[this.n] = Rr[i]; this.n++;
+        const xl = L[i], xr = Rr[i];
+        const pk = Math.max(Math.abs(xl), Math.abs(xr));
+        const req = pk > this.ceil ? this.ceil / pk : 1;
+        this.env = req < this.env ? req : req + (this.env - req) * this.rel;
+        this.g = this.env + (this.g - this.env) * this.att;
+        const ol = this.dl[this.di], or = this.dr[this.di];
+        this.dl[this.di] = xl; this.dr[this.di] = xr; this.di = (this.di + 1) % this.LA;
+        const c = this.ceil;
+        this.l[this.n] = Math.max(-c, Math.min(c, ol * this.g)); this.r[this.n] = Math.max(-c, Math.min(c, or * this.g)); this.n++;
         if (this.n === this.size) {
           this.port.postMessage({ f0: this.f0, l: this.l, r: this.r }, [this.l.buffer, this.r.buffer]);
           this.l = new Float32Array(this.size); this.r = new Float32Array(this.size); this.n = 0;
