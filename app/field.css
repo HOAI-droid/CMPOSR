@@ -47,7 +47,10 @@ button:focus-visible, [role="slider"]:focus-visible { outline: 2px solid var(--a
 }
 .disp .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 10px; letter-spacing: 0.12em; color: var(--muted); min-width: 0; }
 .disp .row > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.disp .world { background: none; border: 0; padding: 6px 0; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.disp .world { position: relative; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid #5a3a28; background: #141414; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--accent); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.disp .world::after { content: ""; position: absolute; inset: -7px -4px; }
+.disp .world .wl { color: var(--muted); margin-right: 6px; }
+.disp .world:active { background: #262626; }
 .disp .world b { color: var(--fg); font-weight: 500; }
 .disp .world .to { color: var(--accent); }
 .disp .main { display: flex; align-items: center; gap: 12px; min-height: 40px; }
