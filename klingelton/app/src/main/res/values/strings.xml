@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Klingelton</string>
+    <string name="share_label">Als Klingelton</string>
+    <string name="saved_ringtones">Gespeichert unter „Klingeltöne“: %1$s</string>
+    <string name="saved">Gespeichert: %1$s</string>
+    <string name="save_failed">Speichern hat nicht geklappt</string>
+    <string name="share_title">Klingelton teilen</string>
+</resources>

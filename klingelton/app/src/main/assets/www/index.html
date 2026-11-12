@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klingelton erstellen</title>
+    <style>
+        /* Basis & Reset - 100% lokal ohne externe Ressourcen */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-top: #fcf9fa;
+            --bg-mid: #f9eff3;
+            --bg-bot: #f5e4eb;
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --border-soft: rgba(217, 130, 155, 0.32);
+            --text-main: #4a323b;
+            --text-muted: #8c6876;
+            --accent: #d9829b;
+            --accent-dark: #c46883;
+            --accent-light: #fdf4f7;
+            --font-serif: Georgia, 'Times New Roman', serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        html, body {
+            min-height: 100%;
+            width: 100%;
+            overflow-x: hidden;
+            font-family: var(--font-sans);
+            color: var(--text-main);
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 55%, var(--bg-bot) 100%);
+            /* Verlauf am Bildschirm ausrichten – sonst entsteht unter dem Inhalt eine sichtbare Kante */
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px;
+            position: relative;
+        }
+
+        /* Hintergrund-Schleifen (hauchzarte Line-Art) */
+        .bg-decor {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bg-bow-tl {
+            position: absolute;
+            top: 18px;
+            left: 12px;
+            width: 125px;
+            height: 125px;
+            color: rgba(217, 130, 155, 0.28);
+            transform: rotate(-12deg);
+        }
+
+        .bg-bow-br {
+            position: absolute;
+            bottom: 18px;
+            right: 12px;
+            width: 140px;
+            height: 140px;
+            color: rgba(217, 130, 155, 0.25);
+            transform: rotate(12deg);
+        }
+
+        /* Hauptcontainer */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Kopfbereich */
+        .header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-bow {
+            width: 82px;
+            height: 56px;
+            color: var(--accent);
+        }
+
+        .title {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Fehlermeldung */
+        .error-box {
+            background: #fff1f4;
+            border: 1px solid #f4b8c8;
+            color: #9e2a4b;
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 0.85rem;
+            text-align: center;
+            line-height: 1.45;
+        }
+
+        /* Milchglas-Karte */
+        .card {
+            position: relative;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-soft);
+            border-radius: 28px;
+            padding: 28px 22px;
+            box-shadow: 0 18px 42px rgba(185, 110, 135, 0.1);
+        }
+
+        .card-corner-bow {
+            position: absolute;
+            top: -20px;
+            right: -6px;
+            width: 44px;
+            height: 44px;
+            color: rgba(217, 130, 155, 0.72);
+            transform: rotate(14deg);
+            pointer-events: none;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 18px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, #e58ea8 0%, #d4718f 100%);
+            box-shadow: 0 8px 20px rgba(217, 130, 155, 0.35);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-align: center;
+            transition: transform 0.15s ease, filter 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.04);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.985);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 13px 18px;
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            background: var(--accent-light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s ease, transform 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-secondary:hover {
+            background: #f9e8ee;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.985);
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-decoration: underline;
+            text-decoration-color: rgba(217, 130, 155, 0.6);
+            text-underline-offset: 4px;
+            cursor: pointer;
+            padding: 8px 12px;
+        }
+
+        .btn-link:hover {
+            color: var(--text-main);
+        }
+
+        .btn-gallery-alt {
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px dashed rgba(217, 130, 155, 0.55);
+            border-radius: 14px;
+            font-family: var(--font-sans);
+            font-size: 0.84rem;
+            font-weight: 500;
+            color: var(--text-main);
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            transition: background 0.15s ease, border-color 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-gallery-alt:hover {
+            background: #fdf4f7;
+            border-color: var(--accent);
+        }
+
+        .btn-gallery-alt:active {
+            transform: scale(0.99);
+        }
+
+        /* Schritt 1 */
+        .step-block {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: center;
+        }
+
+        .privacy-note {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* Ladezustand */
+        .loading-box {
+            padding: 14px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+        }
+
+        .pulse-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent-light);
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            animation: pulseSoft 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            50% { transform: scale(1.07); opacity: 1; }
+        }
+
+        .loading-title {
+            font-family: var(--font-serif);
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .file-caption {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            max-width: 260px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0 auto;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: #f5e2e9;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 15%;
+            background: linear-gradient(90deg, #e58ea8, #d4718f);
+            border-radius: 999px;
+            transition: width 0.25s ease;
+        }
+
+        /* Fertig-Ansicht */
+        .done-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 auto;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #9e4f68;
+            background: var(--accent-light);
+            border: 1px solid var(--border-soft);
+        }
+
+        .player-wrap {
+            background: #fcf7f9;
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 8px;
+        }
+
+        audio {
+            width: 100%;
+            height: 42px;
+            display: block;
+            border-radius: 10px;
+        }
+
+        .action-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ringtone-info {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .hint-box {
+            background: #fdf2f6;
+            border: 1px solid #f0c2d1;
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 0.78rem;
+            color: #7d4a5c;
+            line-height: 1.45;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #a68290;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding-top: 2px;
+        }
+
+        .footer-brand {
+            font-family: var(--font-serif);
+            font-style: italic;
+        }
+
+        .footer-bow {
+            color: var(--accent);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Zarte Line-Art-Schleifen im Hintergrund -->
+    <div class="bg-decor" aria-hidden="true">
+        <svg class="bg-bow-tl" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M60 52 C42 30, 16 34, 20 52 C23 66, 46 60, 60 52 Z"/>
+            <path d="M60 52 C78 30, 104 34, 100 52 C97 66, 74 60, 60 52 Z"/>
+            <path d="M58 54 C48 74, 38 92, 26 106"/>
+            <path d="M62 54 C72 74, 82 92, 94 106"/>
+            <circle cx="60" cy="52" r="2.4"/>
+        </svg>
+
+        <svg class="bg-bow-br" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M60 52 C42 30, 16 34, 20 52 C23 66, 46 60, 60 52 Z"/>
+            <path d="M60 52 C78 30, 104 34, 100 52 C97 66, 74 60, 60 52 Z"/>
+            <path d="M58 54 C48 74, 38 92, 26 106"/>
+            <path d="M62 54 C72 74, 82 92, 94 106"/>
+            <circle cx="60" cy="52" r="2.4"/>
+        </svg>
+    </div>
+
+    <main class="app-container">
+        <!-- Titelbereich -->
+        <header class="header">
+            <svg class="header-bow" viewBox="0 0 120 84" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M60 36 C40 12, 12 18, 16 38 C19 52, 44 46, 60 36 Z"/>
+                <path d="M60 36 C80 12, 108 18, 104 38 C101 52, 76 46, 60 36 Z"/>
+                <path d="M45 36 C35 31, 27 33, 24 37" stroke-width="1"/>
+                <path d="M75 36 C85 31, 93 33, 96 37" stroke-width="1"/>
+                <path d="M58 38 C49 54, 39 68, 28 78"/>
+                <path d="M62 38 C71 54, 81 68, 92 78"/>
+                <ellipse cx="60" cy="36" rx="3.2" ry="2.6" fill="#fcf9fa"/>
+            </svg>
+            <h1 class="title">Klingelton erstellen</h1>
+            <p class="subtitle">Dein Video als Klingelton – sofort &amp; ohne Wartezeit</p>
+        </header>
+
+        <!-- Fehlermeldung -->
+        <div id="errorBox" class="error-box hidden" role="alert">
+            <p id="errorText"></p>
+        </div>
+
+        <!-- Hauptkarte -->
+        <section class="card">
+            <!-- Eck-Schleife -->
+            <svg class="card-corner-bow" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M60 52 C42 30, 16 34, 20 52 C23 66, 46 60, 60 52 Z"/>
+                <path d="M60 52 C78 30, 104 34, 100 52 C97 66, 74 60, 60 52 Z"/>
+                <path d="M58 54 C48 74, 38 92, 26 106"/>
+                <path d="M62 54 C72 74, 82 92, 94 106"/>
+                <circle cx="60" cy="52" r="2.4" fill="#ffffff"/>
+            </svg>
+
+            <!-- SCHRITT 1: Video auswählen -->
+            <div id="stepSelect" class="step-block">
+                <!-- Primäre Video-Auswahl ohne capture-Attribut für Galerie/Medienauswahl -->
+                <input
+                    type="file"
+                    id="video-input"
+                    accept="video/mp4,video/quicktime,video/webm,video/x-matroska,video/*,.mp4,.mov,.avi,.mkv"
+                    class="hidden"
+                >
+                <label for="video-input" id="videoLabel" class="btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 10.5c-3.5-4.5-8.5-3.5-8.5.5s5 3.5 8.5-.5z"/>
+                        <path d="M12 10.5c3.5-4.5 8.5-3.5 8.5.5s-5 3.5-8.5-.5z"/>
+                        <path d="M11.5 11.2L8 19.5"/>
+                        <path d="M12.5 11.2L16 19.5"/>
+                        <circle cx="12" cy="10.5" r="1"/>
+                    </svg>
+                    <span>Video aus Galerie wählen</span>
+                </label>
+
+                <!-- Alternative Dateiauswahl für Android WebViews, die bei video/* die Kamera priorisieren -->
+                <input
+                    type="file"
+                    id="files-input"
+                    accept="*/*"
+                    class="hidden"
+                >
+                <label for="files-input" id="filesLabel" class="btn-gallery-alt">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+                    </svg>
+                    <span>Oder über Dateien / Galerie durchsuchen</span>
+                </label>
+
+                <p class="privacy-note">Öffnet direkt deine Galerie &amp; Dateien – ohne Kamera</p>
+            </div>
+
+            <!-- LADESCHRITT -->
+            <div id="stepLoading" class="loading-box hidden">
+                <div class="pulse-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 10.5c-3.5-4.5-8.5-3.5-8.5.5s5 3.5 8.5-.5z"/>
+                        <path d="M12 10.5c3.5-4.5 8.5-3.5 8.5.5s-5 3.5-8.5-.5z"/>
+                        <path d="M11.5 11.2L8 19.5"/>
+                        <path d="M12.5 11.2L16 19.5"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="loading-title">Klingelton wird erstellt...</p>
+                    <p id="loadingFileName" class="file-caption"></p>
+                </div>
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- SCHRITT 2: Anhören & Speichern -->
+            <div id="stepDone" class="step-block hidden">
+                <div>
+                    <span class="done-badge">୨୧ Fertig zum Speichern ୨୧</span>
+                    <p id="doneFileName" class="file-caption" style="margin-top: 6px;">klingelton.mp3</p>
+                </div>
+
+                <div class="player-wrap">
+                    <audio id="audioPlayer" controls></audio>
+                </div>
+
+                <div class="action-stack">
+                    <button id="saveBtn" type="button" class="btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>Klingelton speichern</span>
+                    </button>
+
+                    <button id="shareBtn" type="button" class="btn-secondary hidden">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        <span>Teilen / In Dateien sichern</span>
+                    </button>
+                </div>
+
+                <p class="ringtone-info">
+                    Direkt kompatibel mit den Klingelton-Einstellungen auf Samsung, Android &amp; iPhone.
+                </p>
+
+                <div id="saveHint" class="hint-box hidden">
+                    <strong>Tipp:</strong> Falls die App-Vorschau den Download blockiert, tippe oben rechts auf die <strong>drei Punkte (⋮ / ...)</strong> und wähle <strong>„Im Browser öffnen“</strong> (Chrome / Safari).
+                </div>
+
+                <div>
+                    <button id="resetBtn" type="button" class="btn-link">Anderes Video wählen</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dezenter Footer -->
+        <footer class="footer">
+            <span class="footer-bow">୨୧</span>
+            <span class="footer-brand">bei M</span>
+            <span class="footer-bow">୨୧</span>
+        </footer>
+    </main>
+
+    <!-- MP3-Encoder lamejs liegt lokal neben dieser Datei (funktioniert offline) -->
+    <script src="lame.min.js" defer></script>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // Maximal 40 Sekunden für optimale Klingelton-Größe & Kompatibilität
+            const MAX_DURATION_SEC = 40;
+            // Sanftes Ausblenden, wenn das Video länger ist und abgeschnitten wird
+            const FADE_OUT_SEC = 1.5;
+            const MP3_KBPS = 128;
+
+            // In der Android-App stellt die native Hülle diese Brücke bereit
+            const bridge = window.AndroidBridge || null;
+
+            const videoInput = document.getElementById('video-input');
+            const filesInput = document.getElementById('files-input');
+            const videoLabel = document.getElementById('videoLabel');
+            const filesLabel = document.getElementById('filesLabel');
+            const stepSelect = document.getElementById('stepSelect');
+            const stepLoading = document.getElementById('stepLoading');
+            const stepDone = document.getElementById('stepDone');
+            const errorBox = document.getElementById('errorBox');
+            const errorText = document.getElementById('errorText');
+
+            const loadingFileName = document.getElementById('loadingFileName');
+            const progressBar = document.getElementById('progressBar');
+            const doneFileName = document.getElementById('doneFileName');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const saveBtn = document.getElementById('saveBtn');
+            const shareBtn = document.getElementById('shareBtn');
+            const saveHint = document.getElementById('saveHint');
+            const resetBtn = document.getElementById('resetBtn');
+
+            let currentBlob = null;
+            let currentBlobUrl = null;
+            let currentFileName = 'klingelton.mp3';
+            let currentMimeType = 'audio/mpeg';
+            // Verhindert, dass eine ältere, noch laufende Verarbeitung ein neueres Ergebnis überschreibt
+            let jobCounter = 0;
+            let busy = false;
+
+            function showView(target) {
+                stepSelect.classList.add('hidden');
+                stepLoading.classList.add('hidden');
+                stepDone.classList.add('hidden');
+                target.classList.remove('hidden');
+            }
+
+            function showError(message) {
+                errorText.textContent = message;
+                errorBox.classList.remove('hidden');
+            }
+
+            function clearError() {
+                errorBox.classList.add('hidden');
+            }
+
+            function setProgress(percent) {
+                progressBar.style.width = percent + '%';
+            }
+
+            // Gibt dem Browser kurz Zeit zum Zeichnen, damit der Fortschrittsbalken sichtbar mitläuft
+            function nextFrame() {
+                return new Promise(function (resolve) {
+                    if (window.requestAnimationFrame) {
+                        requestAnimationFrame(function () { setTimeout(resolve, 0); });
+                    } else {
+                        setTimeout(resolve, 16);
+                    }
+                });
+            }
+
+            function resetInputs() {
+                videoInput.value = '';
+                filesInput.value = '';
+            }
+
+            function showLoading(name) {
+                clearError();
+                saveHint.classList.add('hidden');
+                shareBtn.classList.add('hidden');
+                loadingFileName.textContent = name || '';
+                setProgress(20);
+                showView(stepLoading);
+            }
+
+            function failWithMessage(message) {
+                busy = false;
+                resetInputs();
+                showView(stepSelect);
+                showError(message);
+            }
+
+            // Prüft zuverlässig, ob eine ausgewählte Datei ein Video (oder Audio) ist
+            function isSupportedMediaFile(file) {
+                if (!file) return false;
+                const type = (file.type || '').toLowerCase();
+                if (type.startsWith('video/') || type.startsWith('audio/')) {
+                    return true;
+                }
+                return /\.(mp4|mov|webm|mkv|avi|m4v|3gp|mp3|m4a|wav|ogg|aac)$/i.test(file.name || '');
+            }
+
+            function makeBaseName(fileName) {
+                const cleaned = String(fileName || '')
+                    .replace(/\.[^/.]+$/, '')
+                    .replace(/[^\w\-äöüÄÖÜß ]+/g, '_')
+                    .replace(/_+/g, '_')
+                    .replace(/^[_ ]+|[_ ]+$/g, '')
+                    .slice(0, 80);
+                // Erst nach dem Säubern prüfen, sonst bleibt bei Namen wie "😀.mp4" nur "_" übrig
+                return /[A-Za-z0-9äöüÄÖÜß]/.test(cleaned) ? cleaned : 'klingelton';
+            }
+
+            // decodeAudioData mit Promise- und (älterem) Callback-Stil
+            function decodeAudio(audioCtx, arrayBuffer) {
+                return new Promise(function (resolve, reject) {
+                    const result = audioCtx.decodeAudioData(arrayBuffer, resolve, reject);
+                    if (result && typeof result.then === 'function') {
+                        result.then(resolve, reject);
+                    }
+                });
+            }
+
+            // Gemeinsame Verarbeitung für beide Galerie-/Dateiauswahl-Buttons
+            async function handleSelectedFile(file) {
+                if (!file) return;
+
+                if (!isSupportedMediaFile(file)) {
+                    failWithMessage('Bitte wähle eine Videodatei (z. B. MP4 oder MOV) aus deiner Galerie aus.');
+                    return;
+                }
+
+                const jobId = ++jobCounter;
+                busy = true;
+                showLoading(file.name);
+
+                let audioCtx = null;
+                try {
+                    await nextFrame();
+                    const arrayBuffer = await file.arrayBuffer();
+                    if (jobId !== jobCounter) return;
+                    setProgress(40);
+                    await nextFrame();
+
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioCtx();
+                    const audioBuffer = await decodeAudio(audioCtx, arrayBuffer);
+                    if (jobId !== jobCounter) return;
+                    setProgress(60);
+                    await nextFrame();
+
+                    const sampleRate = audioBuffer.sampleRate;
+                    const maxSamples = Math.min(audioBuffer.length, Math.floor(sampleRate * MAX_DURATION_SEC));
+                    const numChannels = Math.min(audioBuffer.numberOfChannels, 2);
+                    const wasTrimmed = audioBuffer.length > maxSamples;
+
+                    // Kopien statt Ansichten, damit das Ausblenden den Original-Puffer nicht verändert
+                    const left = audioBuffer.getChannelData(0).slice(0, maxSamples);
+                    const right = numChannels > 1 ? audioBuffer.getChannelData(1).slice(0, maxSamples) : null;
+
+                    if (wasTrimmed) {
+                        applyFadeOut(left, sampleRate);
+                        if (right) applyFadeOut(right, sampleRate);
+                    }
+
+                    const baseName = makeBaseName(file.name);
+
+                    let outputBlob = null;
+                    let fileExt = 'mp3';
+                    let mimeType = 'audio/mpeg';
+
+                    // Echtes MP3 mit lamejs, bei Problemen automatischer WAV-Fallback
+                    if (window.lamejs && typeof window.lamejs.Mp3Encoder === 'function') {
+                        try {
+                            outputBlob = await encodeMp3WithLame(left, right, numChannels, sampleRate, function (p) {
+                                setProgress(60 + Math.round(p * 32));
+                            });
+                        } catch (mp3Err) {
+                            console.warn('MP3-Fallback auf WAV:', mp3Err);
+                            outputBlob = null;
+                        }
+                    }
+                    if (!outputBlob) {
+                        outputBlob = encode16BitWav(left, right, numChannels, sampleRate);
+                        fileExt = 'wav';
+                        mimeType = 'audio/wav';
+                    }
+                    if (jobId !== jobCounter) return;
+
+                    setProgress(96);
+
+                    currentFileName = baseName + '.' + fileExt;
+                    currentMimeType = mimeType;
+
+                    if (currentBlobUrl) {
+                        URL.revokeObjectURL(currentBlobUrl);
+                    }
+                    currentBlob = outputBlob;
+                    currentBlobUrl = URL.createObjectURL(outputBlob);
+
+                    // Teilen-Button: in der App immer, im Browser nur wenn unterstützt
+                    if (bridge) {
+                        shareBtn.classList.remove('hidden');
+                    } else {
+                        try {
+                            const shareTestFile = new File([outputBlob], currentFileName, { type: currentMimeType });
+                            if (navigator.canShare && navigator.canShare({ files: [shareTestFile] })) {
+                                shareBtn.classList.remove('hidden');
+                            }
+                        } catch (_) {}
+                    }
+
+                    setProgress(100);
+                    audioPlayer.src = currentBlobUrl;
+                    doneFileName.textContent = currentFileName;
+
+                    setTimeout(function () {
+                        if (jobId !== jobCounter) return;
+                        busy = false;
+                        showView(stepDone);
+                    }, 180);
+
+                } catch (err) {
+                    console.error(err);
+                    if (jobId !== jobCounter) return;
+                    failWithMessage('Diese Datei enthält keine lesbare Tonspur oder wird nicht unterstützt. Bitte wähle ein anderes Video.');
+                } finally {
+                    // AudioContext immer schließen – sonst gehen nach einigen Versuchen die Audio-Ressourcen aus
+                    if (audioCtx && audioCtx.close) {
+                        audioCtx.close().catch(function () {});
+                    }
+                }
+            }
+
+            videoInput.addEventListener('change', function (event) {
+                const file = event.target.files && event.target.files[0];
+                handleSelectedFile(file);
+            });
+
+            filesInput.addEventListener('change', function (event) {
+                const file = event.target.files && event.target.files[0];
+                handleSelectedFile(file);
+            });
+
+            // ---------- Android-App: native Auswahl, Speichern & Teilen ----------
+            if (bridge) {
+                // Die native Seite öffnet die Android-Galerie (ohne Kamera) bzw. die Dateiauswahl
+                videoLabel.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!busy) bridge.pickVideo();
+                });
+                filesLabel.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!busy) bridge.pickFile();
+                });
+
+                // Native Seite hat eine Datei bekommen und bereitet sie vor (Tonspur herausschneiden)
+                window.onNativePickStart = function (name) {
+                    busy = true;
+                    jobCounter++;
+                    showLoading(name);
+                    setProgress(10);
+                };
+
+                window.onNativeFile = async function (info) {
+                    try {
+                        const response = await fetch(info.url);
+                        if (!response.ok) throw new Error('HTTP ' + response.status);
+                        const blob = await response.blob();
+                        handleSelectedFile(new File([blob], info.name, { type: info.type || '' }));
+                    } catch (err) {
+                        console.error(err);
+                        failWithMessage('Die Datei konnte nicht geöffnet werden. Bitte wähle ein anderes Video.');
+                    }
+                };
+
+                window.onNativePickError = function () {
+                    failWithMessage('Die Datei konnte nicht geöffnet werden. Bitte wähle ein anderes Video.');
+                };
+
+                // Zurück-Taste: von der Ergebnis-Ansicht zurück zur Auswahl statt die App zu schließen
+                window.__appBack = function () {
+                    if (!stepDone.classList.contains('hidden')) {
+                        resetBtn.click();
+                        return true;
+                    }
+                    return false;
+                };
+            }
+
+            function blobToBase64(blob) {
+                return blobToDataUrl(blob).then(function (dataUrl) {
+                    return String(dataUrl).slice(String(dataUrl).indexOf(',') + 1);
+                });
+            }
+
+            // Klingelton speichern
+            saveBtn.addEventListener('click', async function () {
+                if (!currentBlob) return;
+
+                if (bridge) {
+                    try {
+                        const base64 = await blobToBase64(currentBlob);
+                        const result = bridge.saveFile(base64, currentFileName, currentMimeType);
+                        if (result === 'error') {
+                            showError('Der Klingelton konnte nicht gespeichert werden. Bitte versuche es noch einmal.');
+                        } else {
+                            clearError();
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        showError('Der Klingelton konnte nicht gespeichert werden. Bitte versuche es noch einmal.');
+                    }
+                    return;
+                }
+
+                const isSandboxed = window.self !== window.top;
+                let triggered = false;
+
+                try {
+                    const a = document.createElement('a');
+                    a.href = currentBlobUrl;
+                    a.download = currentFileName;
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    triggered = true;
+                } catch (_) {}
+
+                // Data-URI nur noch bei Bedarf erzeugen (spart Speicher & Zeit)
+                if (!triggered && currentBlob.size < 15 * 1024 * 1024) {
+                    try {
+                        const dataUrl = await blobToDataUrl(currentBlob);
+                        const aFallback = document.createElement('a');
+                        aFallback.href = dataUrl;
+                        aFallback.download = currentFileName;
+                        aFallback.style.display = 'none';
+                        document.body.appendChild(aFallback);
+                        aFallback.click();
+                        document.body.removeChild(aFallback);
+                        triggered = true;
+                    } catch (_) {}
+                }
+
+                if (isSandboxed || !triggered) {
+                    saveHint.classList.remove('hidden');
+                }
+            });
+
+            // Teilen / In Dateien sichern
+            shareBtn.addEventListener('click', async function () {
+                if (!currentBlob) return;
+
+                if (bridge) {
+                    try {
+                        const base64 = await blobToBase64(currentBlob);
+                        bridge.shareFile(base64, currentFileName, currentMimeType);
+                    } catch (err) {
+                        console.error(err);
+                        showError('Teilen ist gerade nicht möglich. Bitte versuche es noch einmal.');
+                    }
+                    return;
+                }
+
+                try {
+                    const shareFile = new File([currentBlob], currentFileName, { type: currentMimeType });
+                    await navigator.share({
+                        files: [shareFile],
+                        title: currentFileName
+                    });
+                } catch (err) {
+                    if (err && err.name !== 'AbortError') {
+                        saveHint.classList.remove('hidden');
+                    }
+                }
+            });
+
+            // Neues Video wählen
+            resetBtn.addEventListener('click', function () {
+                audioPlayer.pause();
+                audioPlayer.removeAttribute('src');
+                audioPlayer.load();
+                if (currentBlobUrl) {
+                    URL.revokeObjectURL(currentBlobUrl);
+                    currentBlobUrl = null;
+                }
+                currentBlob = null;
+                busy = false;
+                resetInputs();
+                clearError();
+                saveHint.classList.add('hidden');
+                showView(stepSelect);
+            });
+
+            // Lineares Ausblenden am Ende, damit der Klingelton nicht mitten im Ton abreißt
+            function applyFadeOut(samples, sampleRate) {
+                const fadeLen = Math.min(samples.length, Math.floor(sampleRate * FADE_OUT_SEC));
+                const start = samples.length - fadeLen;
+                for (let i = 0; i < fadeLen; i++) {
+                    samples[start + i] *= 1 - (i + 1) / fadeLen;
+                }
+            }
+
+            // MP3-Encoder über lamejs (128 kbps), in Häppchen mit Pausen fürs Zeichnen
+            async function encodeMp3WithLame(leftFloat32, rightFloat32, numChannels, sampleRate, onProgress) {
+                const stereo = numChannels === 2 && !!rightFloat32;
+                const mp3Encoder = new window.lamejs.Mp3Encoder(stereo ? 2 : 1, sampleRate, MP3_KBPS);
+                const leftInt16 = floatTo16BitPCM(leftFloat32);
+                const rightInt16 = stereo ? floatTo16BitPCM(rightFloat32) : null;
+
+                const sampleBlockSize = 1152;
+                const blocksPerSlice = 200; // ca. 5 Sekunden Audio pro Durchgang
+                const mp3Data = [];
+                const total = leftInt16.length;
+
+                for (let i = 0; i < total; i += sampleBlockSize) {
+                    const leftChunk = leftInt16.subarray(i, i + sampleBlockSize);
+                    const mp3buf = stereo
+                        ? mp3Encoder.encodeBuffer(leftChunk, rightInt16.subarray(i, i + sampleBlockSize))
+                        : mp3Encoder.encodeBuffer(leftChunk);
+                    if (mp3buf.length > 0) {
+                        mp3Data.push(mp3buf);
+                    }
+                    if ((i / sampleBlockSize) % blocksPerSlice === blocksPerSlice - 1) {
+                        if (onProgress) onProgress(i / total);
+                        await nextFrame();
+                    }
+                }
+
+                const endBuf = mp3Encoder.flush();
+                if (endBuf.length > 0) {
+                    mp3Data.push(endBuf);
+                }
+                if (onProgress) onProgress(1);
+
+                return new Blob(mp3Data, { type: 'audio/mpeg' });
+            }
+
+            function floatTo16BitPCM(float32Array) {
+                const int16 = new Int16Array(float32Array.length);
+                for (let i = 0; i < float32Array.length; i++) {
+                    const s = Math.max(-1, Math.min(1, float32Array[i]));
+                    int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                }
+                return int16;
+            }
+
+            // Reiner JavaScript 16-Bit PCM WAV-Encoder als verlässlicher Offline-Fallback
+            function encode16BitWav(leftFloat32, rightFloat32, numChannels, sampleRate) {
+                const channels = numChannels === 2 && rightFloat32 ? 2 : 1;
+                const numSamples = leftFloat32.length;
+                const bytesPerSample = 2;
+                const blockAlign = channels * bytesPerSample;
+                const dataSize = numSamples * blockAlign;
+                const buffer = new ArrayBuffer(44 + dataSize);
+                const view = new DataView(buffer);
+
+                writeAscii(view, 0, 'RIFF');
+                view.setUint32(4, 36 + dataSize, true);
+                writeAscii(view, 8, 'WAVE');
+                writeAscii(view, 12, 'fmt ');
+                view.setUint32(16, 16, true);
+                view.setUint16(20, 1, true); // PCM
+                view.setUint16(22, channels, true);
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, sampleRate * blockAlign, true);
+                view.setUint16(32, blockAlign, true);
+                view.setUint16(34, 16, true);
+                writeAscii(view, 36, 'data');
+                view.setUint32(40, dataSize, true);
+
+                let offset = 44;
+                for (let i = 0; i < numSamples; i++) {
+                    const l = Math.max(-1, Math.min(1, leftFloat32[i]));
+                    view.setInt16(offset, l < 0 ? l * 0x8000 : l * 0x7FFF, true);
+                    offset += 2;
+
+                    if (channels === 2) {
+                        const r = Math.max(-1, Math.min(1, rightFloat32[i]));
+                        view.setInt16(offset, r < 0 ? r * 0x8000 : r * 0x7FFF, true);
+                        offset += 2;
+                    }
+                }
+
+                return new Blob([buffer], { type: 'audio/wav' });
+            }
+
+            function writeAscii(view, offset, str) {
+                for (let i = 0; i < str.length; i++) {
+                    view.setUint8(offset + i, str.charCodeAt(i));
+                }
+            }
+
+            function blobToDataUrl(blob) {
+                return new Promise(function (resolve, reject) {
+                    const reader = new FileReader();
+                    reader.onloadend = function () { resolve(reader.result); };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

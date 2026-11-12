@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Kein automatisches Abdunkeln: die Farben sollen genau so bleiben -->
+    <style name="Theme.Klingelton" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/bg_gradient</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>
