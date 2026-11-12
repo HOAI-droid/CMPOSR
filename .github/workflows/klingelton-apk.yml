@@ -1,12 +1,16 @@
-# Baut die Android-App "Klingelton Ersteller" (Ordner klingelton/) und stellt die APK als Download bereit:
-# Actions → letzter Lauf → Artifacts → klingelton-ersteller-apk
+# Baut die Android-App "Klingelton Ersteller" (Ordner klingelton/) und veröffentlicht die APK
+# unter einem festen Download-Link:
+# https://github.com/HOAI-droid/CMPOSR/releases/download/klingelton-latest/Klingelton-Ersteller.apk
 name: Klingelton-App bauen
 on:
   push:
     paths: ['klingelton/**', '.github/workflows/klingelton-apk.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: klingelton-apk
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,14 +18,24 @@ jobs:
       run:
         working-directory: klingelton
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
-      - run: ./gradlew assembleRelease lintDebug --no-daemon
-      - uses: actions/upload-artifact@v4
+      # Das Android-SDK ist auf den GitHub-Runnern bereits installiert (ANDROID_HOME)
+      - run: ./gradlew assembleRelease --no-daemon
+      - run: cp app/build/outputs/apk/release/app-release.apk Klingelton-Ersteller.apk
+      - uses: actions/upload-artifact@v5
         with:
           name: klingelton-ersteller-apk
-          path: klingelton/app/build/outputs/apk/release/app-release.apk
+          path: klingelton/Klingelton-Ersteller.apk
+      - name: APK als Download veröffentlichen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete klingelton-latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create klingelton-latest Klingelton-Ersteller.apk \
+            --target "$GITHUB_SHA" \
+            --title "Klingelton Ersteller (by_M)" \
+            --notes "Neueste Version der App. APK aufs Android-Handy laden und installieren (ab Android 8)."
