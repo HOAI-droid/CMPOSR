@@ -1,4 +1,4 @@
-package de.beim.klingelton
+package de.by_m.klingeltonersteller
 
 import android.content.Context
 import android.media.MediaCodec

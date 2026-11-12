@@ -1,4 +1,4 @@
-package de.beim.klingelton
+package de.by_m.klingeltonersteller
 
 import android.annotation.SuppressLint
 import android.content.ContentValues

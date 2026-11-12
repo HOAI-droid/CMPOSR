@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "de.beim.klingelton"
+    namespace = "de.by_m.klingeltonersteller"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "de.beim.klingelton"
+        applicationId = "de.by_m.klingeltonersteller"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

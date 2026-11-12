@@ -1,4 +1,6 @@
-# Klingelton – Android-App
+# Klingelton Ersteller – Android-App
+
+Autor: by_M
 
 Macht aus einem Video einen Klingelton (MP3, max. 40 Sekunden). Alles läuft offline auf dem Handy.
 

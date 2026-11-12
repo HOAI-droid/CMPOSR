@@ -1,5 +1,5 @@
-# Baut die Android-App "Klingelton" (Ordner klingelton/) und stellt die APK als Download bereit:
-# Actions → letzter Lauf → Artifacts → klingelton-apk
+# Baut die Android-App "Klingelton Ersteller" (Ordner klingelton/) und stellt die APK als Download bereit:
+# Actions → letzter Lauf → Artifacts → klingelton-ersteller-apk
 name: Klingelton-App bauen
 on:
   push:
@@ -23,5 +23,5 @@ jobs:
       - run: ./gradlew assembleRelease lintDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
-          name: klingelton-apk
+          name: klingelton-ersteller-apk
           path: klingelton/app/build/outputs/apk/release/app-release.apk
